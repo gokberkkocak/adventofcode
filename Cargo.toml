@@ -1,0 +1,12 @@
+[package]
+name = "adventofcode"
+version = "0.1.0"
+authors = ["Gokberk Kocak <gokberkkocak@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+curl = "0.4"
+chrono = "0.4"
+regex = "1.4"
+lazy_static = "1.4"
+dotenv = "0.15"
