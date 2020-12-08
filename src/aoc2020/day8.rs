@@ -62,6 +62,12 @@ impl<'a> State<'a> {
     fn is_naturally_terminated(&self) -> bool {
         self.current_line as usize == self.instructions.len()
     }
+
+    fn reset(&mut self) {
+        self.acc = 0;
+        self.current_line = 0;
+        self.executed_lines = HashSet::new();
+    }
 }
 
 pub fn run() {
@@ -98,6 +104,32 @@ fn part2(input: &str) -> isize {
             !clone_state.is_naturally_terminated()
         })
         .count();
+    result_acc
+}
+
+fn part2_no_clone(input: &str) -> isize {
+    let mut state = State::new(input);
+    let mut result_acc = 0;
+    for i in 0..state.instructions.len() {
+        if state.instructions[i].0 == "acc" {
+            continue;
+        } else if state.instructions[i].0 == "nop" {
+            state.instructions[i].0 = "jmp";
+        } else {
+            state.instructions[i].0 = "nop";
+        }
+        state.execute_all();
+        if state.is_naturally_terminated() {
+            result_acc = state.acc;
+            break;
+        }
+        if state.instructions[i].0 == "nop" {
+            state.instructions[i].0 = "jmp";
+        } else {
+            state.instructions[i].0 = "nop";
+        }
+        state.reset();
+    }
     result_acc
 }
 
