@@ -92,12 +92,12 @@ fn part2(input: &str) -> isize {
         .iter()
         .enumerate()
         .filter(|(_i, &Instruction(ins, _value))| ins == "nop" || ins == "jmp")
-        .take_while(|&(i, ins)| {
+        .take_while(|&(i, _ins)| {
             let mut clone_state = init_state.clone();
             if clone_state.instructions[i].0 == "nop" {
-                clone_state.instructions[i] = Instruction("jmp", ins.1);
+                clone_state.instructions[i].0 = "jmp";
             } else {
-                clone_state.instructions[i] = Instruction("nop", ins.1);
+                clone_state.instructions[i].0 = "nop";
             }
             clone_state.execute_all();
             result_acc = clone_state.acc;
