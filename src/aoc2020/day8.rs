@@ -143,4 +143,11 @@ mod tests {
         let acc = part1(input);
         assert_eq!(5, acc);
     }
+
+    #[test]
+    fn part2_test() {
+        let input = "nop +0\nacc +1\njmp +4\nacc +3\njmp -3\nacc -99\nacc +1\njmp -4\nacc +6";
+        let acc = part2(input);
+        assert_eq!(8, acc);
+    }
 }
