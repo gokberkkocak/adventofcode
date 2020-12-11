@@ -111,7 +111,7 @@ impl Area {
         while changed {
             changed = self.next_round(kind);
             #[cfg(debug_assertions)]
-            self.print_plane();
+            self.print_area();
         }
     }
 
@@ -122,7 +122,7 @@ impl Area {
             .count()
     }
 
-    fn print_plane(&self) {
+    fn print_area(&self) {
         println!("___");
         for i in 0..self.x_len {
             for j in 0..self.y_len {
@@ -180,9 +180,9 @@ pub fn run() {
     let mut area = Area::new(&input);
     let p1 = part1(&mut area);
     println!("p1 {} after {} rounds", p1, area.round);
-    let mut plane = Area::new(&input);
-    let p2 = part2(&mut plane);
-    println!("p2 {} after {} rounds", p2, plane.round);
+    let mut area = Area::new(&input);
+    let p2 = part2(&mut area);
+    println!("p2 {} after {} rounds", p2, area.round);
 }
 
 fn part1(area: &mut Area) -> usize {
