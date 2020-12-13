@@ -35,12 +35,12 @@ fn parse(input: &str) -> (usize, Vec<BusWait>) {
 }
 
 fn part1(buses: &Vec<BusWait>, earliest: usize) -> usize {
-    let (x, m) = buses
+    let (b, m) = buses
         .iter()
-        .map(|x| (x.bus_id, (x.bus_id - earliest % x.bus_id) % x.bus_id))
+        .map(|b| (b.bus_id, b.get_next_departure(earliest)))
         .min_by_key(|&(_, m)| m)
         .unwrap();
-    x * m
+    b * m
 }
 
 fn part2(buses: &mut Vec<BusWait>) -> usize {
@@ -52,25 +52,28 @@ fn part2(buses: &mut Vec<BusWait>) -> usize {
             increment *= bus.bus_id;
             buses.remove(i);
         }
-
     }
     count
 }
 #[derive(Debug)]
 struct BusWait {
     bus_id: usize,
-    wait: usize,
+    req_wait: usize,
 }
 
 impl BusWait {
-    fn new(bus_id: usize, wait: usize) -> Self {
+    fn new(bus_id: usize, req_wait: usize) -> Self {
         Self {
             bus_id,
-            wait: wait % bus_id,
+            req_wait: req_wait % bus_id,
         }
     }
+    fn get_next_departure(&self, time: usize) -> usize {
+        (self.bus_id - time % self.bus_id) % self.bus_id
+    }
+
     fn is_match(&self, time: usize) -> bool {
-        (self.bus_id - time % self.bus_id) % self.bus_id == self.wait
+        self.get_next_departure(time) == self.req_wait
     }
 }
 
