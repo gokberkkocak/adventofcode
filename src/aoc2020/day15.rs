@@ -22,7 +22,7 @@ fn part1(vec: &Vec<usize>) -> usize {
 }
 
 fn part2(vec: &Vec<usize>) -> usize {
-    calculate_with_vec(vec, 30000000)
+    calculate_with_map(vec, 30000000)
 }
 
 fn calculate_with_map(vec: &Vec<usize>, n: usize) -> usize {
@@ -32,9 +32,14 @@ fn calculate_with_map(vec: &Vec<usize>, n: usize) -> usize {
     });
     let mut key = *vec.iter().last().unwrap();
     for i in vec.len() - 1..n - 1 {
-        let old_position = map.entry(key).or_insert(i); // if it is first time put i
-        let new_key = i - *old_position; // first time makes it 0
-        map.insert(key, i); // update key with last position.
+        let mut old_position = usize::MAX;
+        map.entry(key)
+            .and_modify(|x| {
+                old_position = *x;
+                *x = i;
+            })
+            .or_insert(i);
+        let new_key = i.saturating_sub(old_position); 
         key = new_key; // set new key
     }
     key
