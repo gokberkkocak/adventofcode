@@ -22,7 +22,7 @@ fn part1(vec: &Vec<usize>) -> usize {
 }
 
 fn part2(vec: &Vec<usize>) -> usize {
-    calculate_with_map(vec, 30000000)
+    calculate_with_vec(vec, 30000000)
 }
 
 fn calculate_with_map(vec: &Vec<usize>, n: usize) -> usize {
