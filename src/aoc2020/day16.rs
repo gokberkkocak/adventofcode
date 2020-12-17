@@ -100,7 +100,7 @@ fn part2(input: &str) -> usize {
             }
         }
     }
-    // no need for complex backtrack search, there is always one clear choice.
+    // no need for backtrack search, there is always one clear choice.
     let mut field_to_rule_mapping = HashMap::new();
     while field_to_rule_mapping.len() < rules.0.len() {
         for id in 0..rules.0.len() {
