@@ -43,10 +43,7 @@ impl<'a> ArithmeticState<'a> {
                     ParseStatus::Number(x, y) => {
                         self.parse_status = ParseStatus::Operator;
                         let num = self.formula[x..y].parse::<isize>().unwrap();
-                        match self.current_operator {
-                            Operator::Sum => self.result += num,
-                            Operator::Multiply => self.result *= num,
-                        }
+                        self.result = self.current_operator.apply(self.result, num);
                         self.current_operator = Operator::Sum;
                     }
                 },
@@ -57,21 +54,14 @@ impl<'a> ArithmeticState<'a> {
                     ParseStatus::Number(x, y) => {
                         self.parse_status = ParseStatus::Operator;
                         let num = self.formula[x..y].parse::<isize>().unwrap();
-                        match self.current_operator {
-                            Operator::Sum => self.result += num,
-                            Operator::Multiply => self.result *= num,
-                        }
+                        self.result = self.current_operator.apply(self.result, num);
                         self.current_operator = Operator::Multiply;
                     }
                 },
                 c if c == '(' => {
                     let mut sub_state = ArithmeticState::new(&self.formula[i + 1..]);
                     let (num, ind) = sub_state.calculate();
-                    match self.current_operator {
-                        Operator::Sum => self.result += num,
-                        Operator::Multiply => self.result *= num,
-                    }
-
+                    self.result = self.current_operator.apply(self.result, num);
                     i += ind + 1;
                 }
                 c if c == ')' => {
@@ -80,10 +70,7 @@ impl<'a> ArithmeticState<'a> {
                         ParseStatus::Number(x, y) => {
                             self.parse_status = ParseStatus::Operator;
                             let num = self.formula[x..y].parse::<isize>().unwrap();
-                            match self.current_operator {
-                                Operator::Sum => self.result += num,
-                                Operator::Multiply => self.result *= num,
-                            }
+                            self.result = self.current_operator.apply(self.result, num);
                         }
                     }
                     return (self.result, i);
@@ -97,10 +84,7 @@ impl<'a> ArithmeticState<'a> {
         match self.parse_status {
             ParseStatus::Number(x, y) => {
                 let num = self.formula[x..y].parse::<isize>().unwrap();
-                match self.current_operator {
-                    Operator::Sum => self.result += num,
-                    Operator::Multiply => self.result *= num,
-                }
+                self.result = self.current_operator.apply(self.result, num);
             }
             ParseStatus::Operator => (),
         }
@@ -111,6 +95,15 @@ impl<'a> ArithmeticState<'a> {
 enum Operator {
     Sum,
     Multiply,
+}
+
+impl Operator {
+    fn apply(&self, lhs: isize, rhs: isize) -> isize {
+        match self {
+            Operator::Sum => return lhs + rhs,
+            Operator::Multiply => return lhs * rhs,
+        }
+    }
 }
 
 enum ParseStatus {
@@ -133,7 +126,7 @@ fn part2(input: &str) -> isize {
     input
         .lines()
         .map(|line| {
-            let new_line = add_parantheses(line);
+            let new_line = add_parentheses(line);
             let mut a = ArithmeticState::new(&new_line);
             let (r, _) = a.calculate();
             r
@@ -141,7 +134,7 @@ fn part2(input: &str) -> isize {
         .sum()
 }
 
-fn add_parantheses(input: &str) -> String {
+fn add_parentheses(input: &str) -> String {
     format!(
         "({})",
         input
@@ -182,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_11() {
-        let input = add_parantheses("1 + 2 * 3 + 4 * 5 + 6");
+        let input = add_parentheses("1 + 2 * 3 + 4 * 5 + 6");
         let mut a = ArithmeticState::new(&input);
         let (r, _) = a.calculate();
         assert_eq!(r, 231);
@@ -190,14 +183,14 @@ mod tests {
 
     #[test]
     fn test_12() {
-        let input = add_parantheses("1 + (2 * 3) + (4 * (5 + 6))");
+        let input = add_parentheses("1 + (2 * 3) + (4 * (5 + 6))");
         let mut a = ArithmeticState::new(&input);
         let (r, _) = a.calculate();
         assert_eq!(r, 51);
     }
     #[test]
     fn test_13() {
-        let input = add_parantheses("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2");
+        let input = add_parentheses("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2");
         let mut a = ArithmeticState::new(&input);
         let (r, _) = a.calculate();
         assert_eq!(r, 23340);
