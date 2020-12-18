@@ -143,8 +143,6 @@ fn add_parentheses(input: &str) -> String {
             .replace(" * ", ") * (")
             .replace(" ", "")
     )
-    .chars()
-    .collect()
 }
 
 #[cfg(test)]
