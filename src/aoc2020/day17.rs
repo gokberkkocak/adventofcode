@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub fn run() {
     let input = crate::util::get_puzzle_input(2020, 17);
@@ -21,15 +21,16 @@ fn part2(input: &str) -> usize {
 }
 
 fn parse(input: &str, solve_type: SolveType) -> PocketDimension {
-    let mut points = HashMap::new();
+    let mut points = HashSet::new();
     for (i, line) in input.lines().enumerate() {
         for (j, c) in line.chars().enumerate() {
-            let is_active;
             match c {
-                '#' => is_active = true,
-                _ => is_active = false,
+                '#' => {
+                    points.insert(Point::new(i as isize, j as isize, 0, 0));
+                }
+                _ => {}
             }
-            points.insert(Point::new(i as isize, j as isize, 0, 0), is_active);
+            // points.insert(Point::new(i as isize, j as isize, 0, 0), is_active);
         }
     }
     let pd = PocketDimension::new(points, solve_type);
@@ -42,14 +43,14 @@ enum SolveType {
 }
 
 struct PocketDimension {
-    points: HashMap<Point, bool>,
+    points: HashSet<Point>,
     min_bound: (isize, isize, isize, isize),
     max_bound: (isize, isize, isize, isize),
     solve_type: SolveType,
 }
 
 impl PocketDimension {
-    fn new(points: HashMap<Point, bool>, solve_type: SolveType) -> Self {
+    fn new(points: HashSet<Point>, solve_type: SolveType) -> Self {
         let mut s = Self {
             points,
             min_bound: (0, 0, 0, 0),
@@ -61,12 +62,12 @@ impl PocketDimension {
     }
 
     fn adjust_boundaries(&mut self) {
-        let min_x = self.points.iter().min_by_key(|&p| p.0.x).unwrap().0.x - 1;
-        let max_x = self.points.iter().max_by_key(|&p| p.0.x).unwrap().0.x + 1;
-        let min_y = self.points.iter().min_by_key(|&p| p.0.y).unwrap().0.y - 1;
-        let max_y = self.points.iter().max_by_key(|&p| p.0.y).unwrap().0.y + 1;
-        let min_z = self.points.iter().min_by_key(|&p| p.0.z).unwrap().0.z - 1;
-        let max_z = self.points.iter().max_by_key(|&p| p.0.z).unwrap().0.z + 1;
+        let min_x = self.points.iter().min_by_key(|&p| p.x).unwrap().x - 1;
+        let max_x = self.points.iter().max_by_key(|&p| p.x).unwrap().x + 1;
+        let min_y = self.points.iter().min_by_key(|&p| p.y).unwrap().y - 1;
+        let max_y = self.points.iter().max_by_key(|&p| p.y).unwrap().y + 1;
+        let min_z = self.points.iter().min_by_key(|&p| p.z).unwrap().z - 1;
+        let max_z = self.points.iter().max_by_key(|&p| p.z).unwrap().z + 1;
         let min_w;
         let max_w;
         match &self.solve_type {
@@ -75,8 +76,8 @@ impl PocketDimension {
                 max_w = 0;
             }
             SolveType::P2 => {
-                min_w = self.points.iter().min_by_key(|&p| p.0.w).unwrap().0.w - 1;
-                max_w = self.points.iter().max_by_key(|&p| p.0.w).unwrap().0.w + 1;
+                min_w = self.points.iter().min_by_key(|&p| p.w).unwrap().w - 1;
+                max_w = self.points.iter().max_by_key(|&p| p.w).unwrap().w + 1;
             }
         }
 
@@ -85,7 +86,7 @@ impl PocketDimension {
     }
 
     fn apply_cycle(&mut self) {
-        let mut next_cycle_points = HashMap::new();
+        let mut next_cycle_points = HashSet::new();
         for i in self.min_bound.0..=self.max_bound.0 {
             for j in self.min_bound.1..=self.max_bound.1 {
                 for k in self.min_bound.2..=self.max_bound.2 {
@@ -98,23 +99,18 @@ impl PocketDimension {
                         }
                         let active_n_count = neighbours
                             .iter()
-                            .map(|&p2| *self.points.entry(p2).or_insert(false))
+                            .map(|&p2| self.points.contains(&p2))
                             .filter(|&b| b)
                             .count();
-                        let is_active = *self.points.entry(p).or_insert(false);
-                        match is_active {
+                        match self.points.contains(&p) {
                             true => {
-                                if active_n_count > 3 || active_n_count < 2 {
-                                    next_cycle_points.insert(p, false);
-                                } else {
-                                    next_cycle_points.insert(p, true);
+                                if !(active_n_count > 3 || active_n_count < 2) {
+                                    next_cycle_points.insert(p);
                                 }
                             }
                             false => {
                                 if active_n_count == 3 {
-                                    next_cycle_points.insert(p, true);
-                                } else {
-                                    next_cycle_points.insert(p, false);
+                                    next_cycle_points.insert(p);
                                 }
                             }
                         }
@@ -127,7 +123,7 @@ impl PocketDimension {
     }
 
     fn get_nb_active(&self) -> usize {
-        self.points.iter().filter(|(_, &b)| b).count()
+        self.points.iter().count()
     }
 
     fn solve(&mut self) {
