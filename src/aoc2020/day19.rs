@@ -69,7 +69,7 @@ fn solve<'a>(word: &'a str, rule: u8, rules_map: &HashMap<u8, Rule>) -> Vec<&'a 
         for rule in rules {
             let mut new_words = Vec::new();
             for word in words {
-                new_words.append(&mut solve(word, *rule as u8, rules_map))
+                new_words.append(&mut solve(word, *rule, rules_map))
             }
             words = new_words;
         }
