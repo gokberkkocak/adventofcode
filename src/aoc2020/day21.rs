@@ -42,7 +42,7 @@ fn parse(input: &str) -> (AllergenPool, Vec<&str>) {
                 let a_id = allergen_set.iter().position(|&x| x == a).unwrap();
                 ingredient_domains
                     .entry((i_id, a_id))
-                    .and_modify(|e| e.increment())
+                    .and_modify(|e| e.increment(1))
                     .or_insert(AllergenSupport::new(i_id, a_id));
             }
         }
@@ -139,7 +139,7 @@ impl<'a> AllergenPool<'a> {
                     if ingredient_domains.contains_key(&(i_id, allerg)) {
                         ingredient_domains
                             .entry((i_id, allerg))
-                            .and_modify(|e| (0..times).for_each(|_| e.decrement()));
+                            .and_modify(|e| e.decrement(times));
                     }
                 }
                 if inner_solve(
@@ -156,7 +156,7 @@ impl<'a> AllergenPool<'a> {
                         if ingredient_domains.contains_key(&(i_id, allerg)) {
                             ingredient_domains
                                 .entry((i_id, allerg))
-                                .and_modify(|e| (0..times).for_each(|_| e.increment()));
+                                .and_modify(|e| e.increment(times));
                         }
                     }
                     assignments.remove(&ing);
@@ -192,12 +192,12 @@ impl AllergenSupport {
         }
     }
 
-    fn increment(&mut self) {
-        self.support += 1;
+    fn increment(&mut self, value: isize) {
+        self.support += value;
     }
 
-    fn decrement(&mut self) {
-        self.support -= 1;
+    fn decrement(&mut self, value: isize) {
+        self.support -= value;
     }
 }
 
