@@ -119,83 +119,76 @@ impl WholeImage {
                 for t in all_v {
                     if !seen.contains(&t.id) {
                         seen.insert(t.id);
-                        for x in x_min..=x_max {
-                            for y in y_min..=y_max {
-                                if image.contains_key(&(x, y)) {
-                                    let n = is_neighbour(image.get(&(x, y)).unwrap(), &t);
-                                    if n.up
-                                    // && (y + 1isize <= y_max || y_max - y_min + 1 < len as isize)
-                                    // && !image.contains_key(&(x, y + 1))
-                                    {
-                                        // let mut new_t = t.clone();
-                                        // new_t.neighbourhood.down = true;
-                                        // image.get_mut(&(x, y)).unwrap().neighbourhood.up = true;
-                                        image.insert((x, y + 1), t.clone());
-                                        let new_y_max = y_max.max(y + 1);
-                                        if solve(
-                                            x_min, x_max, y_min, new_y_max, image, tiles, all_v,
-                                            seen, len,
-                                        ) {
-                                            return true;
-                                        }
-                                        //revert
-                                        image.remove(&(x, y + 1)).unwrap();
-                                    }
-                                    if n.down
-                                    // && (y - 1isize >= y_min || y_max - y_min + 1 < len as isize)
-                                    // && !image.contains_key(&(x, y - 1))
-                                    {
-                                        // let mut new_t = t.clone();
-                                        // new_t.neighbourhood.up = true;
-                                        // image.get_mut(&(x, y)).unwrap().neighbourhood.down = true;
-                                        image.insert((x, y - 1), t.clone());
-                                        let new_y_min = y_min.min(y - 1);
-                                        if solve(
-                                            x_min, x_max, new_y_min, y_max, image, tiles, all_v,
-                                            seen, len,
-                                        ) {
-                                            return true;
-                                        }
-                                        //revert
-                                        image.remove(&(x, y - 1)).unwrap();
-                                    }
-                                    if n.left
-                                    // && (x - 1isize >= x_min || x_max - x_min + 1 < len as isize)
-                                    // && !image.contains_key(&(x - 1, y))
-                                    {
-                                        // let mut new_t = t.clone();
-                                        // new_t.neighbourhood.right = true;
-                                        // image.get_mut(&(x, y)).unwrap().neighbourhood.left = true;
-                                        image.insert((x - 1, y), t.clone());
-                                        let new_x_min = x_min.min(x - 1);
-                                        if solve(
-                                            new_x_min, x_max, y_min, y_max, image, tiles, all_v,
-                                            seen, len,
-                                        ) {
-                                            return true;
-                                        }
-                                        //revert
-                                        image.remove(&(x - 1, y)).unwrap();
-                                    }
-                                    if n.right
-                                    // && (x + 1isize <= x_min || x_max - x_min + 1 < len as isize)
-                                    // && !image.contains_key(&(x + 1, y))
-                                    {
-                                        // let mut new_t = t.clone();
-                                        // new_t.neighbourhood.left = true;
-                                        // image.get_mut(&(x, y)).unwrap().neighbourhood.right = true;
-                                        image.insert((x + 1, y), t.clone());
-                                        let new_x_max = x_max.max(x + 1);
-                                        if solve(
-                                            x_min, new_x_max, y_min, y_max, image, tiles, all_v,
-                                            seen, len,
-                                        ) {
-                                            return true;
-                                        }
-                                        //revert
-                                        image.remove(&(x + 1, y)).unwrap();
-                                    }
+                        let keys = image.keys().cloned().collect::<Vec<_>>();
+                        for (x, y) in keys {
+                            let n = is_neighbour(image.get(&(x, y)).unwrap(), &t);
+                            if n.up
+                            // && (y + 1isize <= y_max || y_max - y_min + 1 < len as isize)
+                            // && !image.contains_key(&(x, y + 1))
+                            {
+                                // let mut new_t = t.clone();
+                                // new_t.neighbourhood.down = true;
+                                // image.get_mut(&(x, y)).unwrap().neighbourhood.up = true;
+                                image.insert((x, y + 1), t.clone());
+                                let new_y_max = y_max.max(y + 1);
+                                if solve(
+                                    x_min, x_max, y_min, new_y_max, image, tiles, all_v, seen, len,
+                                ) {
+                                    return true;
                                 }
+                                //revert
+                                image.remove(&(x, y + 1)).unwrap();
+                            }
+                            if n.down
+                            // && (y - 1isize >= y_min || y_max - y_min + 1 < len as isize)
+                            // && !image.contains_key(&(x, y - 1))
+                            {
+                                // let mut new_t = t.clone();
+                                // new_t.neighbourhood.up = true;
+                                // image.get_mut(&(x, y)).unwrap().neighbourhood.down = true;
+                                image.insert((x, y - 1), t.clone());
+                                let new_y_min = y_min.min(y - 1);
+                                if solve(
+                                    x_min, x_max, new_y_min, y_max, image, tiles, all_v, seen, len,
+                                ) {
+                                    return true;
+                                }
+                                //revert
+                                image.remove(&(x, y - 1)).unwrap();
+                            }
+                            if n.left
+                            // && (x - 1isize >= x_min || x_max - x_min + 1 < len as isize)
+                            // && !image.contains_key(&(x - 1, y))
+                            {
+                                // let mut new_t = t.clone();
+                                // new_t.neighbourhood.right = true;
+                                // image.get_mut(&(x, y)).unwrap().neighbourhood.left = true;
+                                image.insert((x - 1, y), t.clone());
+                                let new_x_min = x_min.min(x - 1);
+                                if solve(
+                                    new_x_min, x_max, y_min, y_max, image, tiles, all_v, seen, len,
+                                ) {
+                                    return true;
+                                }
+                                //revert
+                                image.remove(&(x - 1, y)).unwrap();
+                            }
+                            if n.right
+                            // && (x + 1isize <= x_min || x_max - x_min + 1 < len as isize)
+                            // && !image.contains_key(&(x + 1, y))
+                            {
+                                // let mut new_t = t.clone();
+                                // new_t.neighbourhood.left = true;
+                                // image.get_mut(&(x, y)).unwrap().neighbourhood.right = true;
+                                image.insert((x + 1, y), t.clone());
+                                let new_x_max = x_max.max(x + 1);
+                                if solve(
+                                    x_min, new_x_max, y_min, y_max, image, tiles, all_v, seen, len,
+                                ) {
+                                    return true;
+                                }
+                                //revert
+                                image.remove(&(x + 1, y)).unwrap();
                             }
                         }
                         seen.remove(&t.id);
