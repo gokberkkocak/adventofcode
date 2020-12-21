@@ -1,8 +1,33 @@
 use std::collections::{HashMap, HashSet};
 
+static MONSTER_PATTERN: [(u8, u8); 15] = [
+    (0, 18),
+    (1, 0),
+    (1, 5),
+    (1, 6),
+    (1, 11),
+    (1, 12),
+    (1, 17),
+    (1, 18),
+    (1, 19),
+    (2, 1),
+    (2, 4),
+    (2, 7),
+    (2, 10),
+    (2, 13),
+    (2, 16),
+];
+
+static MONSTER_X_MAX: usize = 2;
+static MONSTER_Y_MAX: usize = 19;
+
 pub fn run() {
     let input = crate::util::get_puzzle_input(2020, 20);
-    let p1 = part1(&input);
+    let tiles = parse(&input);
+    let whole_image = WholeImage::construct(tiles);
+    let p1 = part1(&whole_image);
+    println!("p1 {}", p1);
+    let p1 = part2(&whole_image);
     println!("p1 {}", p1);
 }
 
@@ -32,20 +57,40 @@ fn parse(input: &str) -> Vec<Tile> {
         .collect()
 }
 
-fn part1(input: &str) -> usize {
-    let v = parse(&input);
-    println!("{}", v.len());
-    let image = WholeImage::construct(parse(&input));
-    let c = image
+fn part1(whole_image: &WholeImage) -> usize {
+    whole_image
         .tiles
         .iter()
         .filter(|(&(x, y), _)| {
-            (x == image.x_min || x == image.x_max) && (y == image.y_min || y == image.y_max)
+            (x == whole_image.x_min || x == whole_image.x_max)
+                && (y == whole_image.y_min || y == whole_image.y_max)
         })
         .map(|(_, t)| t.id as usize)
-        .collect::<Vec<_>>();
-    println!("{:?}", c);
-    c.iter().product::<usize>()
+        .product::<usize>()
+}
+
+fn part2(whole_image: &WholeImage) -> usize {
+    let big_tile = whole_image.convert_to_big_tile();
+    let len = big_tile.image.len();
+    let tile_it = TileVariationIterator::new(big_tile.clone());
+    let nb_monsters = tile_it
+        .map(|t| {
+            let mut count = 0;
+            for x in 0..len - MONSTER_X_MAX {
+                for y in 0..len - MONSTER_Y_MAX {
+                    if MONSTER_PATTERN
+                        .iter()
+                        .all(|&(i, j)| t.image[x + i as usize][y + j as usize])
+                    {
+                        count += 1;
+                    }
+                }
+            }
+            count
+        })
+        .max()
+        .unwrap();
+    big_tile.image.iter().flatten().filter(|&&t| t).count() - nb_monsters * MONSTER_PATTERN.len()
 }
 
 struct WholeImage {
@@ -54,6 +99,7 @@ struct WholeImage {
     x_max: isize,
     y_min: isize,
     y_max: isize,
+    len: u8,
 }
 
 impl WholeImage {
@@ -184,7 +230,29 @@ impl WholeImage {
             x_max,
             y_min,
             y_max,
+            len,
         }
+    }
+
+    fn convert_to_big_tile(&self) -> Tile {
+        let tile_len = self.tiles.get(&(0, 0)).unwrap().image.len();
+        let big_tile_len = (tile_len - 2) * self.len as usize;
+        let mut big_vec = vec![vec![false; big_tile_len]; big_tile_len];
+        for (i, x) in (self.x_min..=self.x_max).enumerate() {
+            for (j, y) in (self.y_min..=self.y_max).rev().enumerate() {
+                let tile = self.tiles.get(&(x, y)).unwrap();
+                let view = &tile.image;
+                for t_i in 0..tile_len - 2 {
+                    for t_j in 0..tile_len - 2 {
+                        if view[t_i + 1][t_j + 1] {
+                            // index mess
+                            big_vec[j * (tile_len - 2) + t_i][i * (tile_len - 2) + t_j] = true;
+                        }
+                    }
+                }
+            }
+        }
+        Tile::new(0, big_vec)
     }
 }
 
@@ -237,8 +305,8 @@ impl Tile {
             std::mem::swap(&mut temp, &mut self.image[i]);
         }
         std::mem::swap(&mut self.hashes.up_hash, &mut self.hashes.down_hash);
-        u16::flip_bits(&mut self.hashes.left_hash);
-        u16::flip_bits(&mut self.hashes.right_hash);
+        usize::flip_bits(&mut self.hashes.left_hash);
+        usize::flip_bits(&mut self.hashes.right_hash);
     }
 
     fn flip_horizontal(&mut self) {
@@ -250,13 +318,13 @@ impl Tile {
             }
         }
         std::mem::swap(&mut self.hashes.left_hash, &mut self.hashes.right_hash);
-        u16::flip_bits(&mut self.hashes.up_hash);
-        u16::flip_bits(&mut self.hashes.down_hash);
+        usize::flip_bits(&mut self.hashes.up_hash);
+        usize::flip_bits(&mut self.hashes.down_hash);
     }
 
     fn transpose(&mut self) {
         for i in 0..self.image.len() {
-            for j in 0..self.image.len() {
+            for j in i..self.image.len() {
                 let mut temp = self.image[i][j];
                 std::mem::swap(&mut temp, &mut self.image[j][i]);
                 std::mem::swap(&mut temp, &mut self.image[i][j]);
@@ -264,6 +332,19 @@ impl Tile {
         }
         std::mem::swap(&mut self.hashes.up_hash, &mut self.hashes.left_hash);
         std::mem::swap(&mut self.hashes.down_hash, &mut self.hashes.right_hash);
+    }
+}
+
+impl std::fmt::Display for Tile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for i in 0..self.image.len() {
+            let line = self.image[i]
+                .iter()
+                .map(|&x| if x { "#" } else { "." })
+                .collect::<String>();
+            writeln!(f, "{}", line).unwrap()
+        }
+        writeln!(f)
     }
 }
 
@@ -334,9 +415,9 @@ trait BitFlipper {
     fn flip_bits(num: &mut Self);
 }
 
-impl BitFlipper for u16 {
-    fn flip_bits(num: &mut u16) {
-        *num = u16::from_str_radix(
+impl BitFlipper for usize {
+    fn flip_bits(num: &mut usize) {
+        *num = usize::from_str_radix(
             &format!("{:010b}", *num).chars().rev().collect::<String>(),
             2,
         )
@@ -346,10 +427,10 @@ impl BitFlipper for u16 {
 
 #[derive(Debug, Clone, Copy)]
 struct TileHash {
-    up_hash: u16,
-    down_hash: u16,
-    left_hash: u16,
-    right_hash: u16,
+    up_hash: usize,
+    down_hash: usize,
+    left_hash: usize,
+    right_hash: usize,
 }
 
 impl TileHash {
@@ -365,10 +446,10 @@ impl TileHash {
     fn calculate_hashes(image: &Vec<Vec<bool>>) -> Self {
         let mut tile_hash = TileHash::new();
         for i in 0..image.len() {
-            tile_hash.up_hash += image[0][i] as u16 * u16::pow(2, i as u32);
-            tile_hash.down_hash += image[image.len() - 1][i] as u16 * u16::pow(2, i as u32);
-            tile_hash.left_hash += image[i][0] as u16 * u16::pow(2, i as u32);
-            tile_hash.right_hash += image[i][image.len() - 1] as u16 * u16::pow(2, i as u32);
+            tile_hash.up_hash += image[0][i] as usize * usize::pow(2, i as u32);
+            tile_hash.down_hash += image[image.len() - 1][i] as usize * usize::pow(2, i as u32);
+            tile_hash.left_hash += image[i][0] as usize * usize::pow(2, i as u32);
+            tile_hash.right_hash += image[i][image.len() - 1] as usize * usize::pow(2, i as u32);
         }
         tile_hash
     }
@@ -380,7 +461,18 @@ mod tests {
     #[test]
     fn test_1() {
         let input = crate::util::read_file("inputs/2020_20_test.in");
-        let p1 = part1(&input);
+        let tiles = parse(&input);
+        let whole_image = WholeImage::construct(tiles);
+        let p1 = part1(&whole_image);
         assert_eq!(p1, 20899048083289);
+    }
+
+    #[test]
+    fn test_2() {
+        let input = crate::util::read_file("inputs/2020_20_test.in");
+        let tiles = parse(&input);
+        let whole_image = WholeImage::construct(tiles);
+        let p2 = part2(&whole_image);
+        assert_eq!(p2, 273);
     }
 }
