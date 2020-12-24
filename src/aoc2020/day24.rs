@@ -89,42 +89,28 @@ impl Tiles {
 }
 
 /*
-*       nw      ne 
-*   w       ()      e  
-*       sw      se      
+*       nw      ne
+*   w       ()      e
+*       sw      se
 */
 
-
 fn parse(input: &str) -> Vec<(isize, isize)> {
-    let mut v = vec![];
-    for line in input.lines() {
-        let (x, y) = RE.captures_iter(line).fold((0, 0), |mut acc, c| {
-            match c.get(0).unwrap().as_str() {
-                "ne" => {
-                    acc.0 += 1;
-                    acc.1 += 1
-                }
-                "se" => {
-                    acc.0 += 1;
-                    acc.1 -= 1
-                }
-                "nw" => {
-                    acc.0 -= 1;
-                    acc.1 += 1
-                }
-                "sw" => {
-                    acc.0 -= 1;
-                    acc.1 -= 1
-                }
-                "e" => acc.0 += 2,
-                "w" => acc.0 -= 2,
-                _ => unreachable!(),
-            }
-            acc
-        });
-        v.push((x, y));
-    }
-    v
+    input
+        .lines()
+        .map(|line| {
+            RE.captures_iter(line)
+                .map(|c| match c.get(0).unwrap().as_str() {
+                    "ne" => (1, 1),
+                    "se" => (1, -1),
+                    "nw" => (-1, 1),
+                    "sw" => (-1, -1),
+                    "e" => (2, 0),
+                    "w" => (-2, 0),
+                    _ => unreachable!(),
+                })
+                .fold((0, 0), |acc, x| (acc.0 + x.0, acc.1 + x.1))
+        })
+        .collect()
 }
 
 fn part1(input: &str) -> usize {
