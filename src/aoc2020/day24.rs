@@ -1,6 +1,14 @@
 use std::collections::HashSet;
 
+use lazy_static::lazy_static;
+
+use regex::Regex;
+
 static NEIGHBOUR_INDEX: [(i8, i8); 6] = [(-1, -1), (-1, 1), (1, -1), (1, 1), (2, 0), (-2, 0)];
+
+lazy_static! {
+    static ref RE: Regex = Regex::new("[ns]?[ew]").unwrap();
+}
 
 pub fn run() {
     let input = crate::util::get_puzzle_input(2020, 24);
@@ -80,41 +88,40 @@ impl Tiles {
     }
 }
 
+/*
+*       nw      ne 
+*   w       ()      e  
+*       sw      se      
+*/
+
+
 fn parse(input: &str) -> Vec<(isize, isize)> {
     let mut v = vec![];
     for line in input.lines() {
-        let mut x = 0;
-        let mut y = 0;
-        let mut read = 0;
-        let mut line_chars = line.chars().collect::<Vec<char>>();
-        line_chars.push('0');
-        for window in line_chars.windows(2) {
-            if window[0] == 'n' || window[0] == 's' {
-                if window[0] == 'n' && window[1] == 'e' {
-                    x += 1;
-                    y += 1;
-                } else if window[0] == 's' && window[1] == 'e' {
-                    x += 1;
-                    y -= 1;
-                } else if window[0] == 'n' && window[1] == 'w' {
-                    x -= 1;
-                    y += 1;
-                } else if window[0] == 's' && window[1] == 'w' {
-                    x -= 1;
-                    y -= 1;
+        let (x, y) = RE.captures_iter(line).fold((0, 0), |mut acc, c| {
+            match c.get(0).unwrap().as_str() {
+                "ne" => {
+                    acc.0 += 1;
+                    acc.1 += 1
                 }
-                read = 2;
-            } else if (window[0] == 'e' || window[0] == 'w') && read == 0 {
-                if window[0] == 'e' {
-                    x += 2;
+                "se" => {
+                    acc.0 += 1;
+                    acc.1 -= 1
                 }
-                if window[0] == 'w' {
-                    x -= 2;
+                "nw" => {
+                    acc.0 -= 1;
+                    acc.1 += 1
                 }
-                read = 1;
+                "sw" => {
+                    acc.0 -= 1;
+                    acc.1 -= 1
+                }
+                "e" => acc.0 += 2,
+                "w" => acc.0 -= 2,
+                _ => unreachable!(),
             }
-            read -= 1;
-        }
+            acc
+        });
         v.push((x, y));
     }
     v
