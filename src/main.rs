@@ -6,6 +6,6 @@ mod util;
 
 fn main() {
     let now = Instant::now();
-    aoc2020::day25::run();
+    aoc2018::day12::run();
     println!("time spent {} us", now.elapsed().as_micros());
 }
