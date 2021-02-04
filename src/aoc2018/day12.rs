@@ -26,15 +26,15 @@ impl Garden {
     }
 
     fn apply_generation(&mut self) {
-        if !self.state[0..=5].iter().all(|&i| !i) {
+        if self.state[0..=5].iter().any(|&i| i) {
             for _ in 0..5 {
                 self.state.insert(0, false);
             }
             self.pad += 5;
         }
-        if !self.state[self.state.len() - 6..self.state.len()]
+        if self.state[self.state.len() - 6..self.state.len()]
             .iter()
-            .all(|&i| !i)
+            .any(|&i| i)
         {
             for _ in 0..5 {
                 self.state.push(false);
