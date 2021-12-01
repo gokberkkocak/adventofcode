@@ -87,8 +87,8 @@ impl dyn Year {
     }
 }
 
-macro_rules! import_mods {
-    () => {
+macro_rules! implement_year {
+    ($t:ident) => {
         pub mod day1;
         pub mod day10;
         pub mod day11;
@@ -114,11 +114,7 @@ macro_rules! import_mods {
         pub mod day7;
         pub mod day8;
         pub mod day9;
-    };
-}
 
-macro_rules! implement_year {
-    ($t:ident) => {
         impl Default for $t {
             fn default() -> Self {
                 Self {}
@@ -206,4 +202,3 @@ macro_rules! implement_year {
 }
 
 pub(crate) use implement_year;
-pub(crate) use import_mods;
