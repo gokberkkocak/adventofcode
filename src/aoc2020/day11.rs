@@ -121,7 +121,7 @@ impl Area {
             .filter(|&s| *s == Seat::OCCUPIED)
             .count()
     }
-    #[allow(dead_code)]
+    #[cfg(debug_assertions)]
     fn print_area(&self) {
         println!("___");
         for i in 0..self.x_len {
