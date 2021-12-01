@@ -12,15 +12,16 @@ fn parse(input: &str) -> Vec<u32> {
 }
 
 fn part1(v: &[u32]) -> usize {
-    v.iter()
-        .zip(v.iter().skip(1))
-        .filter(|(a, b)| b > a)
-        .count()
+    part_core(v, 1)
 }
 
 fn part2(v: &[u32]) -> usize {
+    part_core(v, 3)
+}
+
+fn part_core(v: &[u32], skip: usize) -> usize {
     v.iter()
-        .zip(v.iter().skip(3))
+        .zip(v.iter().skip(skip))
         .filter(|(a, b)| b > a)
         .count()
 }
