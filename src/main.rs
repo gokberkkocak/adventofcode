@@ -12,7 +12,7 @@ mod util;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "aoc", about = "AoC runner.")]
 struct Opt {
-    /// Which year to run
+    /// Run all solutions for a given year.
     #[structopt(short, long)]
     all: bool,
 
