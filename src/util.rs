@@ -5,6 +5,7 @@ use std::{
     path::Path,
 };
 
+use chrono::{Datelike, Utc};
 use curl::easy::{Easy2, Handler, WriteError};
 use dotenv::dotenv;
 
@@ -56,4 +57,12 @@ fn write_to_file(contents: &[u8], filepath: &str) {
     buffered_writer
         .write_all(contents)
         .expect("Unable to write to file");
+}
+
+pub fn get_latest_aoc_date() -> (i32, u32) {
+    let now = Utc::now();
+    match now.month() {
+        12 => (now.year(), now.day().min(25)),
+        _ => (now.year() - 1, 25),
+    }
 }

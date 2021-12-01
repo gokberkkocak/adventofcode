@@ -62,7 +62,7 @@ impl<'a> State<'a> {
     fn is_naturally_terminated(&self) -> bool {
         self.current_line as usize == self.instructions.len()
     }
-
+    #[allow(dead_code)]
     fn reset(&mut self) {
         self.acc = 0;
         self.current_line = 0;
@@ -107,6 +107,7 @@ fn part2(input: &str) -> isize {
     result_acc
 }
 
+#[allow(dead_code)]
 fn part2_no_clone(input: &str) -> isize {
     let mut state = State::new(input);
     let mut result_acc = 0;

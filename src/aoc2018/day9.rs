@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::util::{get_puzzle_input, read_file};
+use crate::util::{get_puzzle_input};
 
 pub fn run() {
     let input = get_puzzle_input(2018, 9);

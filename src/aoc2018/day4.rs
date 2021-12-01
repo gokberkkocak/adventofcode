@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fs::File, io::BufReader, io::Read};
+use std::{collections::HashMap};
 
-use chrono::{Datelike, Duration, NaiveDate, NaiveDateTime, Timelike};
+use chrono::{Datelike, Duration, NaiveDateTime, Timelike};
 
 use crate::util::get_puzzle_input;
 
@@ -108,11 +108,11 @@ pub fn run() {
         guard.add_new_data(&v.sleep_time);
     }
 
-    for (g, v) in &guard_sleep_data {
+    for (_g, v) in &guard_sleep_data {
         println!("{} {} {:?}", v.id, v.total_sleep_time, v.sleep_data);
     }
 
-    // part_1(&guard_sleep_data);
+    part_1(&guard_sleep_data);
     part_2(&guard_sleep_data);
 }
 
@@ -163,7 +163,7 @@ fn part_2(guard_sleep_data: &HashMap<u16, GuardSleep>) {
             .sleep_data
             .iter()
             .enumerate()
-            .max_by_key(|&(i, v)| v)
+            .max_by_key(|&(_i, v)| v)
             .unwrap();
         if max_sleepy_time < *guard_max.1 {
             max_sleepy_time = *guard_max.1;

@@ -45,11 +45,13 @@ fn part2(v: &Vec<u16>) -> usize {
     reach_vec[reach_vec.len() - 1]
 }
 
+#[allow(dead_code)]
 fn part2_recursive(v: &Vec<u16>) -> usize {
     let mut map = HashMap::new();
     number_of_arrangements(v, 0, &mut map)
 }
 
+#[allow(dead_code)]
 fn number_of_arrangements(v: &Vec<u16>, index: usize, map: &mut HashMap<usize, usize>) -> usize {
     if index == v.len() - 1 {
         return 1;

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::util::{get_puzzle_input, read_file};
+use crate::util::{get_puzzle_input};
 
 use regex::Regex;
 

@@ -1,13 +1,8 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader, Error, Write};
-use std::str::Chars;
-
 use crate::util::get_puzzle_input;
 
-pub fn run() -> std::io::Result<()> {
-	part1();
-	part2();
-	Ok(())
+pub fn run()  {
+	part1().unwrap();
+	part2().unwrap();
 }
 
 fn part2() -> std::io::Result<()> {

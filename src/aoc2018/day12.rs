@@ -127,8 +127,8 @@ fn part2(mut garden: Garden) -> isize {
     (50000000000 - 250) * increase + current
 }
 
+#[cfg(test)]
 mod tests {
-    #[allow(unused)]
     use super::*;
 
     #[test]

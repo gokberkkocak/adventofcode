@@ -1,7 +1,5 @@
 use std::{
     collections::HashMap,
-    fs::File,
-    io::{BufReader, Read},
 };
 
 use crate::util::get_puzzle_input;

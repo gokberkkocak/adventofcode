@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::util::{get_puzzle_input, read_file};
+use crate::util::{get_puzzle_input};
 
 #[derive(Debug, Clone)]
 struct Node {

@@ -1,6 +1,4 @@
 use std::collections::HashSet;
-use std::fs::File;
-use std::io::{BufRead, BufReader, Error};
 
 use crate::util::get_puzzle_input;
 
@@ -9,7 +7,7 @@ pub struct Point {
     owners: Vec<String>,
 }
 
-pub fn run() -> Result<(), Error> {
+pub fn run() {
     let input = get_puzzle_input(2018, 3);
     let mut matrix: Vec<Vec<Point>> = Vec::with_capacity(1000);
 
@@ -75,5 +73,4 @@ pub fn run() -> Result<(), Error> {
     }
     println!("overlap {}", count);
     println!("non-conflicted {:?}", ids);
-    Ok(())
 }

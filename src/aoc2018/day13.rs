@@ -383,6 +383,7 @@ fn parse(input: &str, strategy: Strategy) -> (RoadNetwork, Carts) {
     )
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 

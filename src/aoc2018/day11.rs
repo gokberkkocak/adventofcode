@@ -1,9 +1,9 @@
-use std::convert::TryInto;
 
-use crate::util::{get_puzzle_input, read_file};
+use crate::util::{get_puzzle_input};
 
 pub fn run() {
     let input: usize = get_puzzle_input(2018, 11).parse().unwrap();
+    part1(input);
     part2_summed(input);
 }
 
@@ -86,6 +86,8 @@ fn part2_summed(input: usize) {
         }
     }
 }
+
+#[allow(dead_code)]
 fn part2_naive(input: usize) {
     let fuel_matrix = default_fuel_matrix(input);
     let mut max_fuel = isize::MIN;

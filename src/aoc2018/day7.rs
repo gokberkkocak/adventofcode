@@ -1,8 +1,6 @@
 use std::{
     collections::HashMap,
     collections::HashSet,
-    fs::File,
-    io::{BufReader, Read},
 };
 
 use crate::util::get_puzzle_input;
@@ -29,6 +27,7 @@ pub fn run() {
     part_2(&mut task_precedence);
 }
 
+#[allow(dead_code)]
 fn part_1(task_precedence: &mut HashMap<u8, HashSet<u8>>) {
     let mut result = vec![];
     let n = task_precedence.len();

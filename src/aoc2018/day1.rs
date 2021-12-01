@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::util::get_puzzle_input;
 
-pub fn run() -> std::io::Result<()> {
+pub fn run() {
     let input = get_puzzle_input(2018,1);
     let mut sum : isize = 0;
     let mut seen : HashSet<isize> = HashSet::new();
@@ -27,5 +27,4 @@ pub fn run() -> std::io::Result<()> {
         }
     }
    // println!("{:?}", seen);
-    Ok(())
 }
