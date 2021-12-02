@@ -59,7 +59,7 @@ fn write_to_file(contents: &[u8], filepath: &str) {
         .expect("Unable to write to file");
 }
 
-pub fn get_latest_aoc_date() -> (i32, u32) {
+pub fn get_latest_year_and_day() -> (i32, u32) {
     let now = Utc::now();
     match now.month() {
         12 => (now.year(), now.day().min(25)),

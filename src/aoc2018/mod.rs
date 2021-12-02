@@ -1,5 +1,5 @@
-use crate::aoc::Year;
+use crate::aoc::AOCYear;
 
-pub struct Year2018;
+pub struct AOC2018;
 
-crate::aoc::implement_year!(Year2018);
+crate::aoc::implement_year!(AOC2018);

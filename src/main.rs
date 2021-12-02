@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use aoc::Year;
+use aoc::AOCYear;
 use structopt::StructOpt;
 
 mod aoc;
@@ -28,27 +28,27 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
     let (year, day) = return_year_and_day(&opt);
-    let year_obj = return_year_dyn(year);
+    let aoc_year = return_aoc_year(year);
     let now = Instant::now();
     match &opt.all {
-        true => year_obj.run_all(),
-        false => year_obj.run_day(day),
+        true => aoc_year.run_all(),
+        false => aoc_year.run_day(day),
     }
     println!("time spent {} us", now.elapsed().as_micros());
 }
 
 fn return_year_and_day(opt: &Opt) -> (i32, u32) {
-    let (default_year, default_day) = util::get_latest_aoc_date();
-    let year = opt.year.unwrap_or(default_year);
-    let day = opt.day.unwrap_or(default_day);
+    let (latest_year, latest_day) = util::get_latest_year_and_day();
+    let year = opt.year.unwrap_or(latest_year);
+    let day = opt.day.unwrap_or(latest_day);
     (year, day)
 }
 
-fn return_year_dyn(year: i32) -> Box<dyn Year> {
+fn return_aoc_year(year: i32) -> Box<dyn AOCYear> {
     match year {
-        2018 => Box::new(aoc2018::Year2018::default()),
-        2020 => Box::new(aoc2020::Year2020::default()),
-        2021 => Box::new(aoc2021::Year2021::default()),
+        2018 => aoc2018::AOC2018::new(),
+        2020 => aoc2020::AOC2020::new(),
+        2021 => aoc2021::AOC2021::new(),
         _ => panic!("Year {} not implemented", year),
     }
 }

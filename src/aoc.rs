@@ -1,4 +1,4 @@
-pub trait Year {
+pub trait AOCYear {
     fn day1(&self);
     fn day2(&self);
     fn day3(&self);
@@ -26,7 +26,7 @@ pub trait Year {
     fn day25(&self);
 }
 
-impl dyn Year {
+impl dyn AOCYear {
     pub fn run_all(&self) {
         self.day1();
         self.day2();
@@ -115,13 +115,13 @@ macro_rules! implement_year {
         pub mod day8;
         pub mod day9;
 
-        impl Default for $t {
-            fn default() -> Self {
-                Self {}
+        impl $t {
+            pub fn new() -> Box<Self> {
+                Box::new(Self {})
             }
         }
 
-        impl Year for $t {
+        impl AOCYear for $t {
             fn day1(&self) {
                 day1::run();
             }
