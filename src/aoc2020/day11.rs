@@ -16,8 +16,8 @@ static NEIGHBOUR_INDEX: [(i8, i8); 8] = [
 #[derive(Debug, Clone)]
 struct Area {
     seats: HashMap<Point, Seat>,
-    x_len: isize,
-    y_len: isize,
+    _x_len: isize,
+    _y_len: isize,
     round: usize,
 }
 
@@ -33,8 +33,8 @@ impl Area {
         let y_len = seats.keys().max_by_key(|&p| p.1).unwrap().1 + 1;
         Self {
             seats,
-            x_len,
-            y_len,
+            _x_len: x_len,
+            _y_len: y_len,
             round: 0,
         }
     }
@@ -124,8 +124,8 @@ impl Area {
     #[cfg(debug_assertions)]
     fn print_area(&self) {
         println!("___");
-        for i in 0..self.x_len {
-            for j in 0..self.y_len {
+        for i in 0..self._x_len {
+            for j in 0..self._y_len {
                 print!("{}", self.seats.get(&Point(i, j)).unwrap());
             }
             println!();

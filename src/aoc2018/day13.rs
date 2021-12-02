@@ -27,14 +27,14 @@ fn solve(input: &str, strategy: Strategy) -> Point {
 
 #[derive(Debug)]
 struct Road {
-    location: Point,
+    _location: Point,
     connections: Vec<Point>,
 }
 
 impl Road {
     fn new(location: Point, connections: Vec<Point>) -> Self {
         Self {
-            location,
+            _location: location,
             connections,
         }
     }

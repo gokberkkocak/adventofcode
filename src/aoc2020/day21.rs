@@ -178,16 +178,16 @@ impl<'a> AllergenPool<'a> {
 
 #[derive(Debug)]
 struct AllergenSupport {
-    ingredient_id: usize,
-    allergen_id: usize,
+    _ingredient_id: usize,
+    _allergen_id: usize,
     support: isize, // this lad can go negative and it is necessary for backtracking
 }
 
 impl AllergenSupport {
     fn new(ingredient_id: usize, allergen_id: usize) -> Self {
         Self {
-            ingredient_id,
-            allergen_id,
+            _ingredient_id: ingredient_id,
+            _allergen_id: allergen_id,
             support: 1,
         }
     }

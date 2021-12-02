@@ -7,7 +7,7 @@ use crate::util::get_puzzle_input;
 #[derive(Debug)]
 struct Sleep {
     id: Option<u16>,
-    date: (i32, u32, u32),
+    _date: (i32, u32, u32),
     sleep_start: Vec<u8>,
     sleep_end: Vec<u8>,
     sleep_time: Vec<bool>,
@@ -17,7 +17,7 @@ impl Sleep {
     fn new(date: (i32, u32, u32)) -> Self {
         Self {
             id: None,
-            date,
+            _date: date,
             sleep_start: Vec::new(),
             sleep_end: Vec::new(),
             sleep_time: vec![false; 60],
