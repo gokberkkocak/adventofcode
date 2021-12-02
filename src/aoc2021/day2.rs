@@ -45,28 +45,19 @@ fn parse(input: &str) -> Vec<(Op, usize)> {
 }
 
 fn part1(v: &[(Op, usize)]) -> usize {
-    let (h, d) = v.iter().fold((0, 0), |(mut h, mut d), x| {
-        match x.0 {
-            Op::Forward => h += x.1,
-            Op::Up => d -= x.1,
-            Op::Down => d += x.1,
-        }
-        (h, d)
+    let (h, d) = v.iter().fold((0, 0), |(h, d), (op, i)| match op {
+        Op::Forward => (h + i, d),
+        Op::Up => (h, d - i),
+        Op::Down => (h, d + i),
     });
     h * d
 }
 
 fn part2(v: &[(Op, usize)]) -> usize {
-    let (h, d, _) = v.iter().fold((0, 0, 0), |(mut h, mut d, mut aim), x| {
-        match x.0 {
-            Op::Forward => {
-                h += x.1;
-                d += aim * x.1;
-            }
-            Op::Up => aim -= x.1,
-            Op::Down => aim += x.1,
-        }
-        (h, d, aim)
+    let (h, d, _) = v.iter().fold((0, 0, 0), |(h, d, aim), (op, i)| match op {
+        Op::Forward => (h + i, d + aim * i, aim),
+        Op::Up => (h, d, aim - i),
+        Op::Down => (h, d, aim + i),
     });
     h * d
 }
