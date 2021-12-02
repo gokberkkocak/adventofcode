@@ -1,10 +1,7 @@
-use lazy_static::lazy_static;
-
+use once_cell::sync::OnceCell;
 use regex::Regex;
 
-lazy_static! {
-    static ref REG: Regex = Regex::new(r"^(\w+)\s(\d+)").unwrap();
-}
+static REG: OnceCell<Regex> = OnceCell::new();
 
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 2);
@@ -16,48 +13,49 @@ pub(crate) fn run() {
 }
 
 enum Op {
-    Forward,
-    Up,
-    Down,
+    Forward(usize),
+    Up(usize),
+    Down(usize),
 }
 
-impl From<&str> for Op {
-    fn from(input: &str) -> Self {
-        match input {
-            "forward" => Op::Forward,
-            "up" => Op::Up,
-            "down" => Op::Down,
+impl From<(&str, usize)> for Op {
+    fn from(input: (&str, usize)) -> Self {
+        match input.0 {
+            "forward" => Op::Forward(input.1),
+            "up" => Op::Up(input.1),
+            "down" => Op::Down(input.1),
             _ => unreachable!(),
         }
     }
 }
 
-fn parse(input: &str) -> Vec<(Op, usize)> {
+fn parse(input: &str) -> Vec<Op> {
+    REG.get_or_init(|| regex::Regex::new(r"^(\w+)\s(\d+)").unwrap());
     input
         .lines()
         .map(|l| {
-            let matches = REG.captures(l).unwrap();
-            let op = Op::from(matches.get(1).unwrap().as_str());
+            let matches = REG.get().unwrap().captures(l).unwrap();
+            let text = matches.get(1).unwrap().as_str();
             let value = matches.get(2).unwrap().as_str().parse().unwrap();
-            (op, value)
+            Op::from((text, value))
         })
         .collect()
 }
 
-fn part1(v: &[(Op, usize)]) -> usize {
-    let (h, d) = v.iter().fold((0, 0), |(h, d), (op, i)| match op {
-        Op::Forward => (h + i, d),
-        Op::Up => (h, d - i),
-        Op::Down => (h, d + i),
+fn part1(v: &[Op]) -> usize {
+    let (h, d) = v.iter().fold((0, 0), |(h, d), op| match op {
+        Op::Forward(i) => (h + i, d),
+        Op::Up(i) => (h, d - i),
+        Op::Down(i) => (h, d + i),
     });
     h * d
 }
 
-fn part2(v: &[(Op, usize)]) -> usize {
-    let (h, d, _) = v.iter().fold((0, 0, 0), |(h, d, aim), (op, i)| match op {
-        Op::Forward => (h + i, d + aim * i, aim),
-        Op::Up => (h, d, aim - i),
-        Op::Down => (h, d, aim + i),
+fn part2(v: &[Op]) -> usize {
+    let (h, d, _) = v.iter().fold((0, 0, 0), |(h, d, aim), op| match op {
+        Op::Forward(i) => (h + i, d + aim * i, aim),
+        Op::Up(i) => (h, d, aim - i),
+        Op::Down(i) => (h, d, aim + i),
     });
     h * d
 }
