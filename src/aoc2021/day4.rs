@@ -58,18 +58,15 @@ impl fmt::Display for BingoValue {
 
 impl From<&str> for Board {
     fn from(input: &str) -> Self {
-        let mut rows = Vec::new();
-        for line in input.lines() {
-            let row = line
-                .split_ascii_whitespace()
-                .map(|b| BingoValue::NotDrawn(b.parse::<usize>().unwrap()))
-                .collect::<Vec<_>>();
-            rows.push(row);
-        }
-        Board {
-            rows,
-            done: false,
-        }
+        let rows = input
+            .lines()
+            .map(|l| {
+                l.split_ascii_whitespace()
+                    .map(|b| BingoValue::NotDrawn(b.parse::<usize>().unwrap()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        Board { rows, done: false }
     }
 }
 
@@ -87,29 +84,32 @@ impl fmt::Display for Board {
 
 impl Board {
     fn apply_drawn(&mut self, d: usize) {
-        for row in &mut self.rows {
-            for bv in row.iter_mut() {
+        self.rows.iter_mut().for_each(|row| {
+            row.iter_mut().for_each(|bv| {
                 if let BingoValue::NotDrawn(n) = bv {
                     if *n == d {
                         *bv = BingoValue::AlreadyDrawn(*n);
                     }
                 }
-            }
-        }
+            })
+        });
     }
 
     fn check_win(&self) -> bool {
-        for row in &self.rows {
-            if row.iter().all(|bv| bv.is_drawn()) {
-                return true;
-            }
+        if self
+            .rows
+            .iter()
+            .any(|row| row.iter().all(|bv| bv.is_drawn()))
+        {
+            return true;
         }
 
-        for column in 0..self.rows.len() {
-            if (0..self.rows.len()).all(|r| self.rows[r][column].is_drawn()) {
-                return true;
-            }
+        if (0..self.rows.len())
+            .any(|column| (0..self.rows.len()).all(|r| self.rows[r][column].is_drawn()))
+        {
+            return true;
         }
+
         false
     }
 
