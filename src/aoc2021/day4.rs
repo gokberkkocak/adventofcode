@@ -96,21 +96,11 @@ impl Board {
     }
 
     fn check_win(&self) -> bool {
-        if self
-            .rows
+        self.rows
             .iter()
             .any(|row| row.iter().all(|bv| bv.is_drawn()))
-        {
-            return true;
-        }
-
-        if (0..self.rows.len())
-            .any(|column| (0..self.rows.len()).all(|r| self.rows[r][column].is_drawn()))
-        {
-            return true;
-        }
-
-        false
+            || (0..self.rows.len())
+                .any(|column| (0..self.rows.len()).all(|r| self.rows[r][column].is_drawn()))
     }
 
     fn set_done(&mut self) {
