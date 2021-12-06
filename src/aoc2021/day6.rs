@@ -7,15 +7,15 @@ pub(crate) fn run() {
     println!("Part 2: {}", p2);
 }
 
-fn parse(input: &str) -> LambFishes {
-    LambFishes::new(input.split(",").map(|i| i.parse().unwrap()).collect())
+fn parse(input: &str) -> LanternFishes {
+    LanternFishes::new(input.split(",").map(|i| i.parse().unwrap()).collect())
 }
 
-struct LambFishes {
+struct LanternFishes {
     timers: Vec<usize>,
 }
 
-impl LambFishes {
+impl LanternFishes {
     fn new(v: Vec<usize>) -> Self {
         let mut timers = vec![0; 9];
         for i in v {
@@ -29,7 +29,7 @@ impl LambFishes {
     }
 }
 
-fn solve(l: &mut LambFishes, days: usize) -> usize {
+fn solve(l: &mut LanternFishes, days: usize) -> usize {
     for _ in 0..days {
         l.apply_day()
     }
@@ -43,22 +43,22 @@ mod tests {
     #[test]
     fn test_1() {
         let input = crate::util::read_file("inputs/2021_6_test.in");
-        let mut v = parse(&input);
-        let p1 = solve(&mut v, 18);
+        let mut l = parse(&input);
+        let p1 = solve(&mut l, 18);
         assert_eq!(p1, 26);
     }
     #[test]
     fn test_2() {
         let input = crate::util::read_file("inputs/2021_6_test.in");
-        let mut v = parse(&input);
-        let p1 = solve(&mut v, 80);
+        let mut l = parse(&input);
+        let p1 = solve(&mut l, 80);
         assert_eq!(p1, 5934);
     }
     #[test]
     fn test_3() {
         let input = crate::util::read_file("inputs/2021_6_test.in");
-        let mut v = parse(&input);
-        let p1 = solve(&mut v, 256);
+        let mut l = parse(&input);
+        let p1 = solve(&mut l, 256);
         assert_eq!(p1, 26984457539);
     }
 }
