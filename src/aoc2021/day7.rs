@@ -12,13 +12,13 @@ fn parse(input: &str) -> Vec<isize> {
     input.split(",").map(|s| s.parse().unwrap()).collect()
 }
 
-fn median(array: &[isize]) -> isize {
-    if (array.len() % 2) == 0 {
-        let ind_left = array.len() / 2 - 1;
-        let ind_right = array.len() / 2;
-        ((array[ind_left] + array[ind_right]) / 2) as isize
+fn median(sorted_array: &[isize]) -> isize {
+    if (sorted_array.len() % 2) == 0 {
+        let ind_left = sorted_array.len() / 2 - 1;
+        let ind_right = sorted_array.len() / 2;
+        ((sorted_array[ind_left] + sorted_array[ind_right]) / 2) as isize
     } else {
-        array[(array.len() / 2)]
+        sorted_array[(sorted_array.len() / 2)]
     }
 }
 
