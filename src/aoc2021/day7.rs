@@ -24,10 +24,8 @@ fn median(sorted_array: &[isize]) -> isize {
 
 // apparently rounded mean might be still off so try get both floor and ceil.
 fn around_mean(array: &[isize]) -> (isize, isize) {
-    (
-        (array.iter().sum::<isize>() as f64 / array.len() as f64).floor() as isize,
-        (array.iter().sum::<isize>() as f64 / array.len() as f64).ceil() as isize,
-    )
+    let mean = array.iter().sum::<isize>() as f64 / array.len() as f64;
+    (mean.floor() as isize, mean.ceil() as isize)
 }
 
 fn part1(sorted_array: &[isize]) -> isize {
