@@ -105,7 +105,7 @@ impl Display {
         });
         // 4 - 1 - b gives d
         let d_value = filter_pattern_value(four, &|x| !one.pattern.contains(&x) && x != b_value);
-        // 0 has len 6 and only one has does not have d
+        // 0 has len 6 and does not have d (6 and 9 have d)
         let zero = filter_patterns_get_first(&self.patterns, &|p| {
             p.pattern.len() == 6 && !p.pattern.contains(&d_value)
         });
