@@ -30,7 +30,7 @@ fn parse(input: &str) -> Vec<Display> {
 }
 #[derive(Debug, PartialEq, Eq)]
 struct SignalPattern {
-    pattern: Vec<u32>,
+    pattern: Vec<u8>,
 }
 
 impl SignalPattern {
@@ -44,7 +44,7 @@ impl SignalPattern {
 
 impl From<&str> for SignalPattern {
     fn from(s: &str) -> Self {
-        let mut v = s.chars().map(|c| c as u32 - 'a' as u32).collect::<Vec<_>>();
+        let mut v = s.chars().map(|c| c as u8 - b'a' ).collect::<Vec<_>>();
         v.sort();
         Self { pattern: v }
     }
@@ -64,7 +64,7 @@ fn filter_patterns_get_first<'a>(
 }
 
 #[inline]
-fn filter_pattern_value<'a>(pattern: &'a SignalPattern, filter: &dyn Fn(u32) -> bool) -> u32 {
+fn filter_pattern_value<'a>(pattern: &'a SignalPattern, filter: &dyn Fn(u8) -> bool) -> u8 {
     pattern
         .pattern
         .iter()
