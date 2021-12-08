@@ -157,17 +157,10 @@ mod tests {
     fn test_2_1() {
         let input = crate::util::read_file("inputs/2021_8_test.in");
         let v = parse(&input);
-        assert_eq!(v[0].decode(), 8394);
-        assert_eq!(v[1].decode(), 9781);
-        assert_eq!(v[2].decode(), 1197);
-        assert_eq!(v[3].decode(), 9361);
-        assert_eq!(v[4].decode(), 4873);
-        assert_eq!(v[5].decode(), 8418);
-        assert_eq!(v[6].decode(), 4548);
-        assert_eq!(v[7].decode(), 1625);
-        assert_eq!(v[8].decode(), 8717);
-        assert_eq!(v[9].decode(), 4315);
-
+        let answers = [8394, 9781, 1197, 9361, 4873, 8418, 4548, 1625, 8717, 4315];
+        for (d, &answer) in v.iter().zip(answers.iter()) {
+            assert_eq!(d.decode(), answer);
+        }
     }
     #[test]
     fn test_2_2() {
