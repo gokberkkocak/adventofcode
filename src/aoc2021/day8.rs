@@ -44,7 +44,7 @@ impl SignalPattern {
 
 impl From<&str> for SignalPattern {
     fn from(s: &str) -> Self {
-        let mut v = s.chars().map(|c| c as u8 - b'a' ).collect::<Vec<_>>();
+        let mut v = s.chars().map(|c| c as u8 - b'a').collect::<Vec<_>>();
         v.sort();
         Self { pattern: v }
     }
@@ -154,7 +154,23 @@ mod tests {
     }
 
     #[test]
-    fn test_2() {
+    fn test_2_1() {
+        let input = crate::util::read_file("inputs/2021_8_test.in");
+        let v = parse(&input);
+        assert_eq!(v[0].decode(), 8394);
+        assert_eq!(v[1].decode(), 9781);
+        assert_eq!(v[2].decode(), 1197);
+        assert_eq!(v[3].decode(), 9361);
+        assert_eq!(v[4].decode(), 4873);
+        assert_eq!(v[5].decode(), 8418);
+        assert_eq!(v[6].decode(), 4548);
+        assert_eq!(v[7].decode(), 1625);
+        assert_eq!(v[8].decode(), 8717);
+        assert_eq!(v[9].decode(), 4315);
+
+    }
+    #[test]
+    fn test_2_2() {
         let input = crate::util::read_file("inputs/2021_8_test.in");
         let v = parse(&input);
         let p2 = part2(&v);
