@@ -56,15 +56,15 @@ struct Display {
 }
 
 #[inline]
-fn filter_patterns_get_first<'a, 'b>(
-    patterns: &'b Vec<SignalPattern>,
-    filter: &dyn Fn(&'b SignalPattern) -> bool,
-) -> &'b SignalPattern {
+fn filter_patterns_get_first<'a>(
+    patterns: &'a Vec<SignalPattern>,
+    filter: &dyn Fn(&'a SignalPattern) -> bool,
+) -> &'a SignalPattern {
     patterns.iter().filter(|p| filter(p)).next().unwrap()
 }
 
 #[inline]
-fn filter_pattern_value<'a, 'b>(pattern: &'b SignalPattern, filter: &dyn Fn(u32) -> bool) -> u32 {
+fn filter_pattern_value<'a>(pattern: &'a SignalPattern, filter: &dyn Fn(u32) -> bool) -> u32 {
     pattern
         .pattern
         .iter()
