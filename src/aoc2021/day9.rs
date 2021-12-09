@@ -54,7 +54,7 @@ impl Caves {
     fn get_bottom_points(&self) -> impl Iterator<Item = (&Point, &u8)> + '_ {
         self.area.iter().filter(move |(p, v)| {
             p.neighbours()
-                .all(|p2| self.area.get(&p2).unwrap_or(&(MAX_HEIGHT_VALUE + 1)) > v)
+                .all(|p2| self.area.get(&p2).unwrap_or(&MAX_HEIGHT_VALUE) > v)
         })
     }
 
@@ -67,7 +67,7 @@ impl Caves {
                     continue;
                 }
                 stack.extend(current.neighbours().filter(|p2| {
-                    self.area.get(&p2).unwrap_or(&(MAX_HEIGHT_VALUE + 1)) < &MAX_HEIGHT_VALUE
+                    self.area.get(&p2).unwrap_or(&MAX_HEIGHT_VALUE) < &MAX_HEIGHT_VALUE
                 }));
                 result_set.insert(current);
             }
