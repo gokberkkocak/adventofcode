@@ -66,17 +66,14 @@ fn get_line_score(s: &str) -> LineScore {
     if stack.is_empty() {
         LineScore::Corrupted(0)
     } else {
-        let score = stack.iter().rev().fold(0, |mut acc, i| {
-            acc *= 5;
-            let add = match i {
-                ')' => 1,
-                ']' => 2,
-                '}' => 3,
-                '>' => 4,
+        let score = stack.iter().rev().fold(0, |acc, i| {
+            match i {
+                ')' => acc * 5 + 1,
+                ']' => acc * 5 + 2,
+                '}' => acc * 5 + 3,
+                '>' => acc * 5 + 4,
                 _ => unreachable!(),
-            };
-            acc += add;
-            acc
+            }
         });
         LineScore::Incomplete(score)
     }
