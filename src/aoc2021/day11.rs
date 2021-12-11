@@ -53,10 +53,10 @@ impl Cavern {
             *cell += 1;
         });
         // use a stack for flash
-        let len = self.map.len() as i8;
+        let len = self.map.len();
         let mut stack = vec![];
-        for y in 0..len as usize {
-            for x in 0..len as usize {
+        for y in 0..len {
+            for x in 0..len {
                 if self.map[y][x] == 10 {
                     stack.push((x, y));
                 }
