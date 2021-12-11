@@ -15,14 +15,14 @@ fn parse(input: &str) -> (Vec<usize>, Vec<Board>) {
         .lines()
         .next()
         .unwrap()
-        .split(",")
+        .split(',')
         .map(|d| d.parse::<usize>().unwrap())
         .collect::<Vec<_>>();
 
     let boards = input
         .split("\n\n")
         .skip(1)
-        .map(|b| Board::from(b))
+        .map(Board::from)
         .collect::<Vec<_>>();
     (drawn, boards)
 }
@@ -129,7 +129,7 @@ impl Board {
 fn part1(drawn: &[usize], boards: &mut [Board]) -> usize {
     for i in drawn {
         boards.iter_mut().for_each(|b| b.apply_drawn(*i));
-        if let Some(winner) = boards.iter().filter(|b| b.check_win()).next() {
+        if let Some(winner) = boards.iter().find(|b| b.check_win()) {
             return winner.sum_of_unmarked() * i;
         }
     }
@@ -143,8 +143,7 @@ fn part2(drawn: &[usize], boards: &mut [Board]) -> usize {
         boards.iter_mut().for_each(|b| b.apply_drawn(*i));
         while let Some(winner) = boards
             .iter_mut()
-            .filter(|b| !b.already_done() && b.check_win())
-            .next()
+            .find(|b| !b.already_done() && b.check_win())
         {
             winner.set_done();
             count += 1;

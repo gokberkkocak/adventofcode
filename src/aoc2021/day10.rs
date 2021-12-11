@@ -9,7 +9,7 @@ pub(crate) fn run() {
 fn part1(input: &str) -> usize {
     input
         .lines()
-        .map(|l| get_line_score(l))
+        .map(get_line_score)
         .filter_map(|s| s.corrupted())
         .sum()
 }
@@ -17,10 +17,10 @@ fn part1(input: &str) -> usize {
 fn part2(input: &str) -> usize {
     let mut v = input
         .lines()
-        .map(|l| get_line_score(l))
+        .map(get_line_score)
         .filter_map(|s| s.incomplete())
         .collect::<Vec<_>>();
-    v.sort();
+    v.sort_unstable();
     v[(v.len() / 2)]
 }
 

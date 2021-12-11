@@ -16,13 +16,13 @@ fn parse(input: &str) -> Vec<Display> {
                 .next()
                 .unwrap()
                 .split_ascii_whitespace()
-                .map(|s| SignalPattern::from(s))
+                .map(SignalPattern::from)
                 .collect();
             let output = it
                 .next()
                 .unwrap()
                 .split_ascii_whitespace()
-                .map(|s| SignalPattern::from(s))
+                .map(SignalPattern::from)
                 .collect();
             Display::new(patterns, output)
         })
@@ -45,7 +45,7 @@ impl SignalPattern {
 impl From<&str> for SignalPattern {
     fn from(s: &str) -> Self {
         let mut v = s.chars().map(|c| c as u8 - b'a').collect::<Vec<_>>();
-        v.sort();
+        v.sort_unstable();
         Self { pattern: v }
     }
 }
@@ -57,20 +57,19 @@ struct Display {
 
 #[inline]
 fn filter_patterns_get_first<'a>(
-    patterns: &'a Vec<SignalPattern>,
+    patterns: &'a [SignalPattern],
     filter: &dyn Fn(&'a SignalPattern) -> bool,
 ) -> &'a SignalPattern {
-    patterns.iter().filter(|p| filter(p)).next().unwrap()
+    patterns.iter().find(|p| filter(p)).unwrap()
 }
 
 #[inline]
-fn filter_pattern_value<'a>(pattern: &'a SignalPattern, filter: &dyn Fn(u8) -> bool) -> u8 {
+fn filter_pattern_value(pattern: &SignalPattern, filter: &dyn Fn(u8) -> bool) -> u8 {
     pattern
         .pattern
         .iter()
         .copied()
-        .filter(|&x| filter(x))
-        .next()
+        .find(|&x| filter(x))
         .unwrap()
 }
 

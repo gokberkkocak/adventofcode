@@ -110,7 +110,7 @@ fn part1(v: &[(Point, Point)]) -> usize {
 }
 
 fn part2(v: &[(Point, Point)]) -> usize {
-    let g = Graph::new(&v);
+    let g = Graph::new(v);
     g.how_many_dangerous()
 }
 

@@ -1,7 +1,7 @@
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 7);
     let mut array = parse(&input);
-    array.sort();
+    array.sort_unstable();
     let p1 = part1(&array);
     println!("Part 1: {}", p1);
     let p2 = part2(&array);
@@ -9,7 +9,7 @@ pub(crate) fn run() {
 }
 
 fn parse(input: &str) -> Vec<isize> {
-    input.split(",").map(|s| s.parse().unwrap()).collect()
+    input.split(',').map(|s| s.parse().unwrap()).collect()
 }
 
 fn median(sorted_array: &[isize]) -> isize {
@@ -35,7 +35,7 @@ fn part1(sorted_array: &[isize]) -> isize {
 
 fn part2(array: &[isize]) -> isize {
     let values = around_mean(array);
-    part2_core(&array, values.0).min(part2_core(&array, values.1))
+    part2_core(array, values.0).min(part2_core(array, values.1))
 }
 
 fn part2_core(array: &[isize], value: isize) -> isize {

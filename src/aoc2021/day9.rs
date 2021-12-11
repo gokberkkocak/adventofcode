@@ -67,7 +67,7 @@ impl Caves {
                     continue;
                 }
                 stack.extend(current.neighbours().filter(|p2| {
-                    self.area.get(&p2).unwrap_or(&MAX_HEIGHT_VALUE) < &MAX_HEIGHT_VALUE
+                    self.area.get(p2).unwrap_or(&MAX_HEIGHT_VALUE) < &MAX_HEIGHT_VALUE
                 }));
                 result_set.insert(current);
             }
@@ -85,7 +85,7 @@ fn part1(caves: &Caves) -> usize {
 
 fn part2(caves: &Caves) -> usize {
     let mut basin_sizes = caves.get_basin_sizes().collect::<Vec<_>>();
-    basin_sizes.sort();
+    basin_sizes.sort_unstable();
     basin_sizes.iter().rev().take(3).product()
 }
 

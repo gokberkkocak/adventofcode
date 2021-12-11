@@ -8,7 +8,7 @@ pub(crate) fn run() {
 }
 
 fn parse(input: &str) -> LanternFishes {
-    LanternFishes::new(input.split(",").map(|i| i.parse().unwrap()).collect())
+    LanternFishes::new(input.split(',').map(|i| i.parse().unwrap()).collect())
 }
 
 struct LanternFishes {
