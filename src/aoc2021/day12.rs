@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::{hash_map::DefaultHasher, HashMap},
+    hash::{Hash, Hasher},
+};
 
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 12);
@@ -21,53 +24,82 @@ fn parse(input: &str) -> Graph {
         })
         .for_each(|(n_1, n_2)| {
             edges
-                .entry(n_1.to_string())
+                .entry(Node::new(n_1))
                 .or_insert_with(Vec::new)
-                .push(n_2.to_string());
+                .push(Node::new(n_2));
             edges
-                .entry(n_2.to_string())
+                .entry(Node::new(n_2))
                 .or_insert_with(Vec::new)
-                .push(n_1.to_string());
+                .push(Node::new(n_1));
         });
     Graph { edges }
 }
 
+#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
+enum Node {
+    Start,
+    End,
+    Small(u64),
+    Big(u64),
+}
+
+
+impl Node {
+    fn new(s: &str) -> Self {
+        if s == "start" {
+            Node::Start
+        } else if s == "end" {
+            Node::End
+        } else if s.chars().next().unwrap().is_lowercase() {
+            let mut hs = DefaultHasher::new();
+            s.hash(&mut hs);
+            Node::Small(hs.finish())
+        } else {
+            let mut hs = DefaultHasher::new();
+            s.hash(&mut hs);
+            Node::Big(hs.finish())
+        }
+    }
+}
 struct Graph {
-    edges: HashMap<String, Vec<String>>,
+    edges: HashMap<Node, Vec<Node>>,
 }
 
 impl Graph {
     #[inline]
-    fn get_connected_nodes(&self, node: &str) -> impl Iterator<Item = &str> {
-        self.edges.get(node).unwrap().iter().map(|n| n.as_str())
+    fn get_connected_nodes(&self, node: &Node) -> impl Iterator<Item = Node> + '_ {
+        self.edges.get(node).unwrap().iter().copied()
     }
 
     fn create_paths(&self, visited: bool) -> usize {
         let mut path = vec![];
-        self.create_path("start", &mut path, visited)
+        self.create_path(Node::Start, &mut path, visited)
     }
 
-    fn create_path<'a, 'b>(
-        &'a self,
-        node: &'a str,
-        path: &'b mut Vec<&'a str>,
-        visited_small_twice: bool,
-    ) -> usize {
-        if node == "end" {
-            return 1;
-        }
+    fn create_path(&self, node: Node, path: &mut Vec<Node>, visited_small_twice: bool) -> usize {
         // add to path
         path.push(node);
         let nb_paths = self
-            .get_connected_nodes(node)
+            .get_connected_nodes(&node)
             .map(|n| {
-                if is_node_small(n) && (!visited_small_twice || !path.contains(&n)) {
-                    self.create_path(n, path, visited_small_twice || path.contains(&n))
-                } else if is_node_big(n) {
-                    self.create_path(n, path, visited_small_twice)
-                } else {
-                    0
+                match n {
+                    Node::Small(_) if (!visited_small_twice || !path.contains(&n)) => {
+                        self.create_path(n, path, visited_small_twice || path.contains(&n))
+                    }
+                    Node::Big(_) => self.create_path(n, path, visited_small_twice),
+                    Node::End => 1,
+                    _ => 0,
                 }
+
+                // if n.is_small() && (!visited_small_twice || !path.contains(&n)) {
+                //     self.create_path(n, path, visited_small_twice || path.contains(&n))
+                // } else if n.is_big() {
+                //     self.create_path(n, path, visited_small_twice)
+                // } else if n.is_end() {
+                //     1
+                // } else {
+                //     0
+                // }
             })
             .sum();
         // remove from path
@@ -75,14 +107,6 @@ impl Graph {
         // finished for this node
         nb_paths
     }
-}
-#[inline]
-fn is_node_big(node: &str) -> bool {
-    node.chars().next().unwrap().is_uppercase()
-}
-#[inline]
-fn is_node_small(node: &str) -> bool {
-    node.chars().next().unwrap().is_lowercase() && node != "start"
 }
 
 #[cfg(test)]
