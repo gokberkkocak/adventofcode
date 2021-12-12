@@ -11,7 +11,7 @@ pub fn run() {
     let p2 = part2(&numbers, p1);
     println!("{}", p2);
 }
-fn part1(numbers: &Vec<isize>) -> isize {
+fn part1(numbers: &[isize]) -> isize {
     let mut sum = numbers.iter().take(25).sum::<isize>();
     for ((l, &x), (r, &y)) in numbers
         .iter()
@@ -27,7 +27,7 @@ fn part1(numbers: &Vec<isize>) -> isize {
     unreachable!()
 }
 
-fn part2(numbers: &Vec<isize>, invalid: isize) -> isize {
+fn part2(numbers: &[isize], invalid: isize) -> isize {
     let mut sum: u64 = 0;
     let summed_nums = numbers
         .iter()

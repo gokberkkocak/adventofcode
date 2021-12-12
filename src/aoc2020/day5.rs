@@ -9,11 +9,11 @@ pub fn run() {
 }
 
 pub fn part1(input: &str) -> usize {
-    input.lines().map(|x| get_seat_value(x)).max().unwrap()
+    input.lines().map(get_seat_value).max().unwrap()
 }
 
 pub fn part2(input: &str) -> usize {
-    let seats = input.lines().map(|x| get_seat_value(x)).collect::<Vec<_>>();
+    let seats = input.lines().map(get_seat_value).collect::<Vec<_>>();
     let max = seats.iter().max().unwrap();
     let min = seats.iter().min().unwrap();
     let sum = seats.iter().sum::<usize>();
@@ -34,6 +34,5 @@ fn get_seat_value(entry: &str) -> usize {
     let (row_str, col_str) = entry.split_at(7);
     let row = get_seat_inner_value(row_str, 'B');
     let col = get_seat_inner_value(col_str, 'R');
-    let seat = row * 8 + col;
-    seat
+    row * 8 + col
 }

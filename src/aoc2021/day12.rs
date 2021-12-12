@@ -1,7 +1,5 @@
-use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
-    hash::{Hash, Hasher},
-};
+use ahash::{AHashMap, AHasher};
+use std::hash::{Hash, Hasher};
 
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 12);
@@ -13,7 +11,7 @@ pub(crate) fn run() {
 }
 
 fn parse(input: &str) -> Graph {
-    let mut edges = HashMap::new();
+    let mut edges = AHashMap::new();
     input
         .lines()
         .map(|line| {
@@ -43,7 +41,6 @@ enum Node {
     Big(u64),
 }
 
-
 impl Node {
     fn new(s: &str) -> Self {
         if s == "start" {
@@ -51,18 +48,18 @@ impl Node {
         } else if s == "end" {
             Node::End
         } else if s.chars().next().unwrap().is_lowercase() {
-            let mut hs = DefaultHasher::new();
+            let mut hs = AHasher::default();
             s.hash(&mut hs);
             Node::Small(hs.finish())
         } else {
-            let mut hs = DefaultHasher::new();
+            let mut hs = AHasher::default();
             s.hash(&mut hs);
             Node::Big(hs.finish())
         }
     }
 }
 struct Graph {
-    edges: HashMap<Node, Vec<Node>>,
+    edges: AHashMap<Node, Vec<Node>>,
 }
 
 impl Graph {
@@ -81,15 +78,13 @@ impl Graph {
         path.push(node);
         let nb_paths = self
             .get_connected_nodes(&node)
-            .map(|n| {
-                match n {
-                    Node::Small(_) if (!visited_small_twice || !path.contains(&n)) => {
-                        self.create_path(n, path, visited_small_twice || path.contains(&n))
-                    }
-                    Node::Big(_) => self.create_path(n, path, visited_small_twice),
-                    Node::End => 1,
-                    _ => 0,
+            .map(|n| match n {
+                Node::Small(_) if (!visited_small_twice || !path.contains(&n)) => {
+                    self.create_path(n, path, visited_small_twice || path.contains(&n))
                 }
+                Node::Big(_) => self.create_path(n, path, visited_small_twice),
+                Node::End => 1,
+                _ => 0,
             })
             .sum();
         // remove from path

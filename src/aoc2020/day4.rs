@@ -15,7 +15,7 @@ fn part_1(input: &str) -> usize {
     input
         .split("\n\n")
         .filter_map(|entry| {
-            Some(true).filter(|_| fields.iter().fold(true, |acc, &x| acc && entry.contains(x)))
+            Some(true).filter(|_| fields.iter().all(|x| entry.contains(x)))
         })
         .count()
 }
@@ -30,7 +30,7 @@ fn entry_validator(entry: &str) -> bool {
     entry
         .split_whitespace()
         .map(|i| {
-            let mut it = i.split(":");
+            let mut it = i.split(':');
             let field = it.next().unwrap();
             let data = it.next().unwrap();
             (field, data)
@@ -47,7 +47,7 @@ fn data_validator(field: &str, data: &str) -> bool {
         "eyr" if data.len() == 4 => validate_range(data, 2020..=2030),
         "hgt" if data.ends_with("cm") => validate_range(data.split_at(data.len() - 2).0, 150..=193),
         "hgt" if data.ends_with("in") => validate_range(data.split_at(data.len() - 2).0, 59..=76),
-        "hcl" if data.starts_with("#") => data.chars().skip(1).all(|c| c.is_ascii_hexdigit()),
+        "hcl" if data.starts_with('#') => data.chars().skip(1).all(|c| c.is_ascii_hexdigit()),
         "ecl" => matches!(data, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"),
         "pid" if data.len() == 9 => data.parse::<u32>().is_ok(),
         _ => false,

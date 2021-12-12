@@ -24,11 +24,11 @@ pub fn run() {
             let small_bag = i.get(2).unwrap().as_str();
             small_to_big
                 .entry(small_bag)
-                .or_insert(Vec::new())
+                .or_insert_with(Vec::new)
                 .push((big_bag, quantity));
             big_to_small
                 .entry(big_bag)
-                .or_insert(Vec::new())
+                .or_insert_with(Vec::new)
                 .push((small_bag, quantity));
         });
     });
@@ -39,7 +39,7 @@ pub fn run() {
 }
 
 fn part1<'a>(small_to_big: &HashMap<&'a str, Vec<(&'a str, usize)>>) -> usize {
-    get_all_bigger_containers("shiny gold", &small_to_big).len()
+    get_all_bigger_containers("shiny gold", small_to_big).len()
 }
 
 fn get_all_bigger_containers<'a>(
@@ -60,7 +60,7 @@ fn get_all_bigger_containers<'a>(
 }
 
 fn part2<'a>(big_to_small: &HashMap<&'a str, Vec<(&'a str, usize)>>) -> usize {
-    get_nb_smaller_containers("shiny gold", &big_to_small) - 1
+    get_nb_smaller_containers("shiny gold", big_to_small) - 1
 }
 
 fn get_nb_smaller_containers<'a>(
