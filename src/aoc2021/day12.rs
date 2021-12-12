@@ -14,7 +14,7 @@ fn parse(input: &str) -> Graph {
     input
         .lines()
         .map(|line| {
-            let mut it = line.split("-");
+            let mut it = line.split('-');
             let n_1 = it.next().unwrap();
             let n_2 = it.next().unwrap();
             (n_1, n_2)
@@ -22,11 +22,11 @@ fn parse(input: &str) -> Graph {
         .for_each(|(n_1, n_2)| {
             edges
                 .entry(n_1.to_string())
-                .or_insert(vec![])
+                .or_insert_with(Vec::new)
                 .push(n_2.to_string());
             edges
                 .entry(n_2.to_string())
-                .or_insert(vec![])
+                .or_insert_with(Vec::new)
                 .push(n_1.to_string());
         });
     Graph { edges }
@@ -38,7 +38,7 @@ struct Graph {
 
 impl Graph {
     #[inline]
-    fn get_connected_nodes<'a, 'b>(&'a self, node: &'a str) -> impl Iterator<Item = &str> {
+    fn get_connected_nodes(&self, node: &str) -> impl Iterator<Item = &str> {
         self.edges.get(node).unwrap().iter().map(|n| n.as_str())
     }
 
@@ -57,7 +57,7 @@ impl Graph {
             return 1;
         }
         // add to path
-        path.push(&node);
+        path.push(node);
         let nb_paths = self
             .get_connected_nodes(node)
             .map(|n| {
