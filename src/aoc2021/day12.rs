@@ -90,16 +90,6 @@ impl Graph {
                     Node::End => 1,
                     _ => 0,
                 }
-
-                // if n.is_small() && (!visited_small_twice || !path.contains(&n)) {
-                //     self.create_path(n, path, visited_small_twice || path.contains(&n))
-                // } else if n.is_big() {
-                //     self.create_path(n, path, visited_small_twice)
-                // } else if n.is_end() {
-                //     1
-                // } else {
-                //     0
-                // }
             })
             .sum();
         // remove from path
