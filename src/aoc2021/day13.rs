@@ -123,8 +123,7 @@ impl std::fmt::Display for Instruction {
         let mut s = String::new();
         for y in 0..=self.max_point.y {
             for x in 0..=self.max_point.x {
-                let p = Point::new(x, y);
-                if self.points.contains(&p) {
+                if self.points.contains(&Point::new(x, y)) {
                     s.push('#');
                 } else {
                     s.push('.');
