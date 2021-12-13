@@ -1,5 +1,3 @@
-use std::{collections::HashSet, hash::Hash};
-
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 13);
     let mut ins = parse(&input);
@@ -11,7 +9,7 @@ pub(crate) fn run() {
 
 fn part1(ins: &mut Instruction) -> usize {
     ins.apply_first_fold_on_stack();
-    ins.points.iter().collect::<HashSet<_>>().len()
+    ins.points.len()
 }
 
 fn part2(ins: &mut Instruction) -> String {
@@ -48,7 +46,7 @@ fn parse(input: &str) -> Instruction {
         fold_stack,
     }
 }
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct Point {
     x: usize,
     y: usize,
@@ -104,6 +102,8 @@ impl Instruction {
             }
         }
         self.max_point = max_point;
+        self.points.sort_unstable();
+        self.points.dedup();
     }
     #[inline]
     fn apply_all_folds(&mut self) {
