@@ -56,7 +56,7 @@ impl Area {
             let mut y = p.1 + j as isize;
             while let Some(p) = self.seats.get(&Point(x, y)) {
                 match p {
-                    Seat::EMPTY | Seat::OCCUPIED => {
+                    Seat::Empty | Seat::Occupied => {
                         v.push(*p);
                         break;
                     }
@@ -77,7 +77,7 @@ impl Area {
             SolveType::P1 => v = self.get_neighbours(p),
             SolveType::P2 => v = self.get_first_seat_each_direction(p),
         }
-        v.into_iter().filter(|&s| s == Seat::OCCUPIED).count()
+        v.into_iter().filter(|&s| s == Seat::Occupied).count()
     }
 
     fn next_round(&mut self, kind: SolveInformation) -> bool {
@@ -86,15 +86,15 @@ impl Area {
         let mut clone_seats = self.seats.clone();
         for (&p, &seat) in self.seats.iter() {
             match seat {
-                Seat::EMPTY if self.get_nb_occupied_neighbours(&p, kind.solve_type) == 0 => {
-                    clone_seats.entry(p).and_modify(|x| *x = Seat::OCCUPIED);
+                Seat::Empty if self.get_nb_occupied_neighbours(&p, kind.solve_type) == 0 => {
+                    clone_seats.entry(p).and_modify(|x| *x = Seat::Occupied);
                     changed_flag = true;
                 }
-                Seat::OCCUPIED
+                Seat::Occupied
                     if self.get_nb_occupied_neighbours(&p, kind.solve_type)
                         >= kind.occupancy_limit =>
                 {
-                    clone_seats.entry(p).and_modify(|x| *x = Seat::EMPTY);
+                    clone_seats.entry(p).and_modify(|x| *x = Seat::Empty);
                     changed_flag = true;
                 }
                 _ => (),
@@ -118,7 +118,7 @@ impl Area {
     fn get_total_nb_occupied(&self) -> usize {
         self.seats
             .values()
-            .filter(|&s| *s == Seat::OCCUPIED)
+            .filter(|&s| *s == Seat::Occupied)
             .count()
     }
     #[cfg(debug_assertions)]
@@ -139,9 +139,9 @@ struct Point(isize, isize);
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Seat {
-    FLOOR,
-    EMPTY,
-    OCCUPIED,
+    Floor,
+    Empty,
+    Occupied,
 }
 #[derive(Debug, Copy, Clone)]
 struct SolveInformation {
@@ -157,9 +157,9 @@ enum SolveType {
 impl std::fmt::Display for Seat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::FLOOR => write!(f, "."),
-            Self::EMPTY => write!(f, "L"),
-            Self::OCCUPIED => write!(f, "#"),
+            Self::Floor => write!(f, "."),
+            Self::Empty => write!(f, "L"),
+            Self::Occupied => write!(f, "#"),
         }
     }
 }
@@ -167,9 +167,9 @@ impl std::fmt::Display for Seat {
 impl Seat {
     fn convert_from_char(c: char) -> Self {
         match c {
-            '.' => Self::FLOOR,
-            'L' => Self::EMPTY,
-            '#' => Self::OCCUPIED,
+            '.' => Self::Floor,
+            'L' => Self::Empty,
+            '#' => Self::Occupied,
             _ => unreachable!(),
         }
     }

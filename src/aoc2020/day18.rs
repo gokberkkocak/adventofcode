@@ -100,8 +100,8 @@ enum Operator {
 impl Operator {
     fn apply(&self, lhs: isize, rhs: isize) -> isize {
         match self {
-            Operator::Sum => return lhs + rhs,
-            Operator::Multiply => return lhs * rhs,
+            Operator::Sum => lhs + rhs,
+            Operator::Multiply => lhs * rhs,
         }
     }
 }

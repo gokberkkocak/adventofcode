@@ -25,7 +25,7 @@ fn part2(input: &str) -> usize {
 }
 
 fn get_sum(input: &str, mask_type: MaskType) -> usize {
-    let mut v = parse(&input);
+    let mut v = parse(input);
     match mask_type {
         MaskType::P1 => v.iter_mut().for_each(|x| x.apply_mask()),
         MaskType::P2 => v.iter_mut().for_each(|x| x.apply_mask_v2()),
@@ -56,7 +56,7 @@ fn parse(input: &str) -> Vec<Mask> {
                     (format!("{:b}", mem), format!("{:b}", value))
                 })
                 .collect::<Vec<_>>();
-            Mask::new(&mask_str, v)
+            Mask::new(mask_str, v)
         })
         .collect::<Vec<_>>()
 }
@@ -131,7 +131,7 @@ impl<'a> Mask<'a> {
                 }
             }
             value.iter().for_each(|x| {
-                let _ = map.insert(*x, usize::from_str_radix(&given, 2).unwrap());
+                let _ = map.insert(*x, usize::from_str_radix(given, 2).unwrap());
             });
         }
         self.calculated_mem_value_pairs = map;

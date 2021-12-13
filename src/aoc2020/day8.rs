@@ -139,7 +139,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn part1_test() {
+    fn test_1() {
         let input = "nop +0\n\
                         acc +1\n\
                         jmp +4\n\
@@ -154,7 +154,7 @@ mod tests {
     }
 
     #[test]
-    fn part2_test() {
+    fn test_2_1() {
         let input = "nop +0\n\
                         acc +1\n\
                         jmp +4\n\
@@ -165,6 +165,21 @@ mod tests {
                         jmp -4\n\
                         acc +6";
         let acc = part2(input);
+        assert_eq!(8, acc);
+    }
+
+    #[test]
+    fn test_2_2() {
+        let input = "nop +0\n\
+                        acc +1\n\
+                        jmp +4\n\
+                        acc +3\n\
+                        jmp -3\n\
+                        acc -99\n\
+                        acc +1\n\
+                        jmp -4\n\
+                        acc +6";
+        let acc = part2_no_clone(input);
         assert_eq!(8, acc);
     }
 }

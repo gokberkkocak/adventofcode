@@ -34,10 +34,9 @@ fn get_encryption(pub_key: usize, other_loop_size: usize) -> usize {
 }
 
 fn part1(input: &str) -> usize {
-    let (card_pub, door_pub) = parse(&input);
+    let (card_pub, door_pub) = parse(input);
     let dl = get_loop_size(door_pub);
-    let enc = get_encryption(card_pub, dl);
-    enc
+    get_encryption(card_pub, dl)
 }
 #[cfg(test)]
 mod tests {

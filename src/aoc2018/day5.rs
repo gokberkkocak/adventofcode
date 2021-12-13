@@ -1,9 +1,7 @@
-
-
 use crate::util::get_puzzle_input;
 
 pub fn run() {
-    let input = get_puzzle_input(2018,5);
+    let input = get_puzzle_input(2018, 5);
     let mut v = Vec::new();
     for c in b'a'..=b'z' {
         let mut output = "".to_string();

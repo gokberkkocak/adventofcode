@@ -25,7 +25,7 @@ fn parse(input: &str) -> (AllergenPool, Vec<&str>) {
         let allergens = it
             .next()
             .unwrap()
-            .strip_suffix(")")
+            .strip_suffix(')')
             .unwrap()
             .split(", ")
             .collect::<Vec<_>>();
@@ -43,7 +43,7 @@ fn parse(input: &str) -> (AllergenPool, Vec<&str>) {
                 ingredient_domains
                     .entry((i_id, a_id))
                     .and_modify(|e| e.increment(1))
-                    .or_insert(AllergenSupport::new(i_id, a_id));
+                    .or_insert_with(|| AllergenSupport::new(i_id, a_id));
             }
         }
     }
@@ -53,7 +53,7 @@ fn parse(input: &str) -> (AllergenPool, Vec<&str>) {
     )
 }
 
-fn part1(pool: &AllergenPool, words: &Vec<&str>) -> usize {
+fn part1(pool: &AllergenPool, words: &[&str]) -> usize {
     words
         .iter()
         .cloned()
@@ -66,15 +66,14 @@ fn part1(pool: &AllergenPool, words: &Vec<&str>) -> usize {
 
 fn part2(pool: &AllergenPool) -> String {
     let mut sorted_allergens = pool.allergen_set.clone();
-    sorted_allergens.sort();
+    sorted_allergens.sort_unstable();
     let mut v = vec![];
     for i in sorted_allergens {
         let a_id = pool.allergen_set.iter().position(|&x| x == i).unwrap();
         let i_id = *pool
             .assignments
             .iter()
-            .filter(|(_i, &a)| a_id == a)
-            .next()
+            .find(|(_i, &a)| a_id == a)
             .unwrap()
             .0;
         v.push(pool.ingredient_set[i_id]);
@@ -84,7 +83,7 @@ fn part2(pool: &AllergenPool) -> String {
         res.push_str(i);
         res.push(',');
     }
-    res.strip_suffix(",").unwrap().to_string()
+    res.strip_suffix(',').unwrap().to_string()
 }
 
 #[derive(Debug)]
@@ -112,8 +111,8 @@ impl<'a> AllergenPool<'a> {
         fn inner_solve<'a>(
             ingredient_domains: &mut HashMap<(usize, usize), AllergenSupport>,
             assignments: &mut HashMap<usize, usize>,
-            ingredient_set: &Vec<&'a str>,
-            allergen_set: &Vec<&'a str>,
+            ingredient_set: &[&'a str],
+            allergen_set: &[&'a str],
         ) -> bool {
             let max_sup = ingredient_domains
                 .iter()
@@ -124,23 +123,20 @@ impl<'a> AllergenPool<'a> {
                 .iter()
                 .filter(|&((_i, _a), t)| t.support == max_sup)
                 .map(|(&(i, a), _)| (i, a))
-                .collect::<Vec<_>>()
-                .clone();
+                .collect::<Vec<_>>();
             if allergen_set.len() == assignments.len() {
                 return true;
             }
-            for (ing, allerg) in max_keys.into_iter() {
+            for (ing, allerg) in max_keys {
                 if assignments.contains_key(&ing) {
                     continue;
                 }
                 assignments.insert(ing, allerg);
                 let times = ingredient_domains.get(&(ing, allerg)).unwrap().support;
                 for (i_id, _i) in ingredient_set.iter().enumerate() {
-                    if ingredient_domains.contains_key(&(i_id, allerg)) {
-                        ingredient_domains
-                            .entry((i_id, allerg))
-                            .and_modify(|e| e.decrement(times));
-                    }
+                    ingredient_domains
+                        .entry((i_id, allerg))
+                        .and_modify(|e| e.decrement(times));
                 }
                 if inner_solve(
                     ingredient_domains,
@@ -162,7 +158,7 @@ impl<'a> AllergenPool<'a> {
                     assignments.remove(&ing);
                 }
             }
-            return false;
+            false
         }
         let mut assignments = HashMap::new();
         if inner_solve(

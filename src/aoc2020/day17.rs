@@ -9,13 +9,13 @@ pub fn run() {
 }
 
 fn part1(input: &str) -> usize {
-    let mut pd = parse(&input, SolveType::P1);
+    let mut pd = parse(input, SolveType::P1);
     pd.solve();
     pd.get_nb_active()
 }
 
 fn part2(input: &str) -> usize {
-    let mut pd = parse(&input, SolveType::P2);
+    let mut pd = parse(input, SolveType::P2);
     pd.solve();
     pd.get_nb_active()
 }
@@ -24,17 +24,13 @@ fn parse(input: &str, solve_type: SolveType) -> PocketDimension {
     let mut points = HashSet::new();
     for (i, line) in input.lines().enumerate() {
         for (j, c) in line.chars().enumerate() {
-            match c {
-                '#' => {
+            if c == '#' {
                     points.insert(Point::new(i as isize, j as isize, 0, 0));
-                }
-                _ => {}
             }
             // points.insert(Point::new(i as isize, j as isize, 0, 0), is_active);
         }
     }
-    let pd = PocketDimension::new(points, solve_type);
-    pd
+    PocketDimension::new(points, solve_type)
 }
 
 enum SolveType {
@@ -104,7 +100,7 @@ impl PocketDimension {
                             .count();
                         match self.points.contains(&p) {
                             true => {
-                                if !(active_n_count > 3 || active_n_count < 2) {
+                                if (2..=3).contains(&active_n_count) {
                                     next_cycle_points.insert(p);
                                 }
                             }
@@ -123,7 +119,7 @@ impl PocketDimension {
     }
 
     fn get_nb_active(&self) -> usize {
-        self.points.iter().count()
+        self.points.len()
     }
 
     fn solve(&mut self) {

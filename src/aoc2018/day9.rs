@@ -1,16 +1,16 @@
 use std::collections::VecDeque;
 
-use crate::util::{get_puzzle_input};
+use crate::util::get_puzzle_input;
 
 pub fn run() {
     let input = get_puzzle_input(2018, 9);
     let mut it = input.split_ascii_whitespace();
     let nb_players = it.next().unwrap().parse::<usize>().unwrap();
     let last_point = it.skip(5).next().unwrap().parse::<usize>().unwrap();
-    solve(nb_players, last_point*100);
+    solve(nb_players, last_point * 100);
 }
 
-fn solve(nb_players: usize, last_point: usize){
+fn solve(nb_players: usize, last_point: usize) {
     let mut points = vec![0; nb_players];
     let mut board = VecDeque::new();
     board.push_back(0);
@@ -24,5 +24,5 @@ fn solve(nb_players: usize, last_point: usize){
             board.push_back(s);
         }
     }
-    println!("{}",points.iter().max().unwrap());
+    println!("{}", points.iter().max().unwrap());
 }

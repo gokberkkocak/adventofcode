@@ -30,11 +30,11 @@ fn parse(input: &str) -> (HashMap<u8, Rule>, &str) {
     let words_str = it.next().unwrap();
     let mut map = HashMap::new();
     for r_line in rules_str.lines() {
-        let mut r_it = r_line.split(":");
+        let mut r_it = r_line.split(':');
         let parent = r_it.next().unwrap().parse::<u8>().unwrap();
         let children_str = r_it.next().unwrap();
-        if !children_str.contains("\"") {
-            let children_it = children_str.split("|");
+        if !children_str.contains('\"') {
+            let children_it = children_str.split('|');
             let rules = children_it
                 .map(|child| {
                     REG.captures_iter(child)
@@ -62,7 +62,7 @@ fn parse(input: &str) -> (HashMap<u8, Rule>, &str) {
 fn solve<'a>(word: &'a str, rule: u8, rules_map: &HashMap<u8, Rule>) -> Vec<&'a str> {
     fn solve_inner<'a>(
         word: &'a str,
-        rules: &Vec<u8>,
+        rules: &[u8],
         rules_map: &HashMap<u8, Rule>,
     ) -> Vec<&'a str> {
         let mut words = vec![word];
@@ -82,8 +82,8 @@ fn solve<'a>(word: &'a str, rule: u8, rules_map: &HashMap<u8, Rule>) -> Vec<&'a 
     match rules_map.get(&rule).unwrap() {
         Rule::Char(c) => word
             .strip_prefix(*c)
-            .and_then(|m| Some(vec![m]))
-            .unwrap_or_else(|| Vec::new()),
+            .map(|m| vec![m])
+            .unwrap_or_else(Vec::new),
         Rule::One(rules) => solve_inner(word, rules, rules_map),
         Rule::Or(rules_1, rules_2) => {
             let mut words = Vec::new();
@@ -95,7 +95,7 @@ fn solve<'a>(word: &'a str, rule: u8, rules_map: &HashMap<u8, Rule>) -> Vec<&'a 
 }
 
 fn part1(input: &str) -> usize {
-    let (rules, words) = parse(&input);
+    let (rules, words) = parse(input);
     words
         .lines()
         .flat_map(|word| solve(word, 0, &rules))

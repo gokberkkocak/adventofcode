@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    collections::HashSet,
-};
+use std::{collections::HashMap, collections::HashSet};
 
 use crate::util::get_puzzle_input;
 

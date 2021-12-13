@@ -23,7 +23,7 @@ pub fn run() {
 fn parse(input: &str) -> (Rules, Ticket, Vec<Ticket>) {
     let mut it = input.split("\n\n");
     let rules_str = it.next().unwrap();
-    let my_ticket_str = it.next().unwrap().lines().skip(1).next().unwrap();
+    let my_ticket_str = it.next().unwrap().lines().nth(1).unwrap();
     let other_tickets_it = it.next().unwrap().lines().skip(1);
     let rules = Rules::new(rules_str);
     let my_ticket = Ticket::new(my_ticket_str);
@@ -59,16 +59,16 @@ struct Ticket(Vec<usize>);
 impl Ticket {
     #[inline]
     fn new(ticket_str: &str) -> Self {
-        Self(ticket_str.split(",").map(|x| x.parse().unwrap()).collect())
+        Self(ticket_str.split(',').map(|x| x.parse().unwrap()).collect())
     }
 }
 #[inline]
 fn parse_multiple_tickets<'a>(multiple_ticket_it: impl Iterator<Item = &'a str>) -> Vec<Ticket> {
-    multiple_ticket_it.map(|line| Ticket::new(line)).collect()
+    multiple_ticket_it.map(Ticket::new).collect()
 }
 
 fn part1(input: &str) -> usize {
-    let (rules, _my_ticket, other_tickets) = parse(&input);
+    let (rules, _my_ticket, other_tickets) = parse(input);
     let mut sum = 0;
     for t in other_tickets {
         for field in t.0 {
@@ -81,12 +81,12 @@ fn part1(input: &str) -> usize {
 }
 
 fn part2(input: &str) -> usize {
-    let (rules, my_ticket, other_tickets) = parse(&input);
+    let (rules, my_ticket, other_tickets) = parse(input);
     // filter invalid tickets first
     let valid_tickets = other_tickets.iter().filter(|t| {
         let valid =
             t.0.iter()
-                .all(|field| rules.0.iter().flatten().any(|range| range.contains(&field)));
+                .all(|field| rules.0.iter().flatten().any(|range| range.contains(field)));
         valid
     });
     // construct possible ticket matches
@@ -94,7 +94,7 @@ fn part2(input: &str) -> usize {
     for t in valid_tickets {
         for (field_id, field) in t.0.iter().enumerate() {
             for (rule_id, rule) in rules.0.iter().enumerate() {
-                if !rule.iter().any(|range| range.contains(&field)) {
+                if !rule.iter().any(|range| range.contains(field)) {
                     field_vec[field_id].remove(&rule_id);
                 }
             }

@@ -17,7 +17,7 @@ pub fn run() {
     println!("{}", p2);
 }
 
-fn part1(v: &Vec<u16>) -> u16 {
+fn part1(v: &[u16]) -> u16 {
     let mut map = HashMap::new();
     for (&i, &j) in v.iter().zip(v.iter().skip(1)) {
         map.entry(j - i).and_modify(|v| *v += 1).or_insert(1);
@@ -25,7 +25,7 @@ fn part1(v: &Vec<u16>) -> u16 {
     map.get(&1).unwrap() * map.get(&3).unwrap()
 }
 
-fn part2(v: &Vec<u16>) -> usize {
+fn part2(v: &[u16]) -> usize {
     let mut reach_vec = vec![0; *v.last().unwrap() as usize + 1];
     reach_vec[0] = 1;
     for &i in v.iter() {
@@ -46,13 +46,13 @@ fn part2(v: &Vec<u16>) -> usize {
 }
 
 #[allow(dead_code)]
-fn part2_recursive(v: &Vec<u16>) -> usize {
+fn part2_recursive(v: &[u16]) -> usize {
     let mut map = HashMap::new();
     number_of_arrangements(v, 0, &mut map)
 }
 
 #[allow(dead_code)]
-fn number_of_arrangements(v: &Vec<u16>, index: usize, map: &mut HashMap<usize, usize>) -> usize {
+fn number_of_arrangements(v: &[u16], index: usize, map: &mut HashMap<usize, usize>) -> usize {
     if index == v.len() - 1 {
         return 1;
     }

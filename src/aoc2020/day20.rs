@@ -40,10 +40,9 @@ fn parse(input: &str) -> Vec<Tile> {
                 .next()
                 .unwrap()
                 .split_ascii_whitespace()
-                .skip(1)
-                .next()
+                .nth(1)
                 .unwrap()
-                .strip_suffix(":")
+                .strip_suffix(':')
                 .unwrap()
                 .parse::<u16>()
                 .unwrap();
@@ -110,8 +109,8 @@ impl WholeImage {
             y_min: isize,
             y_max: isize,
             image: &mut HashMap<(isize, isize), Tile>,
-            tiles: &Vec<Tile>,
-            all_v: &Vec<Tile>,
+            tiles: &[Tile],
+            all_v: &[Tile],
             seen: &mut HashSet<u16>,
             len: u8,
         ) -> bool {
@@ -121,7 +120,7 @@ impl WholeImage {
                         seen.insert(t.id);
                         let keys = image.keys().cloned().collect::<Vec<_>>();
                         for (x, y) in keys {
-                            let n = is_neighbour(image.get(&(x, y)).unwrap(), &t);
+                            let n = is_neighbour(image.get(&(x, y)).unwrap(), t);
                             if n.up
                             // && (y + 1isize <= y_max || y_max - y_min + 1 < len as isize)
                             // && !image.contains_key(&(x, y + 1))
@@ -194,9 +193,9 @@ impl WholeImage {
                         seen.remove(&t.id);
                     }
                 }
-                return false;
+                false
             } else {
-                return true;
+                true
             }
         }
         let len = (tiles.len() as f64).sqrt() as u8;
@@ -436,7 +435,7 @@ impl TileHash {
         }
     }
 
-    fn calculate_hashes(image: &Vec<Vec<bool>>) -> Self {
+    fn calculate_hashes(image: &[Vec<bool>]) -> Self {
         let mut tile_hash = TileHash::new();
         for i in 0..image.len() {
             tile_hash.up_hash += image[0][i] as usize * usize::pow(2, i as u32);

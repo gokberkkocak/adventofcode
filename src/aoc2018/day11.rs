@@ -1,5 +1,4 @@
-
-use crate::util::{get_puzzle_input};
+use crate::util::get_puzzle_input;
 
 pub fn run() {
     let input: usize = get_puzzle_input(2018, 11).parse().unwrap();

@@ -12,20 +12,20 @@ pub fn run() {
 #[inline]
 fn parse(input: &str) -> Vec<usize> {
     input
-        .split(",")
+        .split(',')
         .map(|x| x.parse::<usize>().unwrap())
         .collect::<Vec<_>>()
 }
 
-fn part1(vec: &Vec<usize>) -> usize {
+fn part1(vec: &[usize]) -> usize {
     calculate_with_map(vec, 2020)
 }
 
-fn part2(vec: &Vec<usize>) -> usize {
+fn part2(vec: &[usize]) -> usize {
     calculate_with_vec(vec, 30000000)
 }
 
-fn calculate_with_map(vec: &Vec<usize>, n: usize) -> usize {
+fn calculate_with_map(vec: &[usize], n: usize) -> usize {
     let mut map = HashMap::new();
     vec.iter().enumerate().for_each(|(i, &x)| {
         map.insert(x, i);
@@ -45,7 +45,7 @@ fn calculate_with_map(vec: &Vec<usize>, n: usize) -> usize {
     key
 }
 
-fn calculate_with_vec(vec: &Vec<usize>, n: usize) -> usize {
+fn calculate_with_vec(vec: &[usize], n: usize) -> usize {
     let mut big_vec = vec![usize::MAX; n];
     vec.iter().enumerate().for_each(|(i, &x)| big_vec[x] = i);
     let mut key = *vec.iter().last().unwrap();

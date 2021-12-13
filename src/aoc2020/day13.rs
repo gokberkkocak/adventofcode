@@ -34,7 +34,7 @@ fn parse(input: &str) -> (usize, Vec<BusWait>) {
     (earliest, buses)
 }
 
-fn part1(buses: &Vec<BusWait>, earliest: usize) -> usize {
+fn part1(buses: &[BusWait], earliest: usize) -> usize {
     let (b, m) = buses
         .iter()
         .map(|b| (b.bus_id, b.get_next_departure(earliest)))
@@ -46,7 +46,7 @@ fn part1(buses: &Vec<BusWait>, earliest: usize) -> usize {
 fn part2(buses: &mut Vec<BusWait>) -> usize {
     let mut increment = 1;
     let mut count = 0;
-    while buses.len() > 0 {
+    while !buses.is_empty() {
         count += increment;
         while let Some((i, bus)) = buses.iter().enumerate().find(|(_, b)| b.is_match(count)) {
             increment *= bus.bus_id;

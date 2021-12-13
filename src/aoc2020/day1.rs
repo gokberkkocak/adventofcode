@@ -15,7 +15,7 @@ pub fn run() {
     println!("p2 {}", v.iter().product::<u32>());
 }
 
-fn two_sum(nums: &Vec<u32>, target: u32) -> (u32, u32) {
+fn two_sum(nums: &[u32], target: u32) -> (u32, u32) {
     let mut complements = HashSet::new();
     for i in nums.iter() {
         let c = target - *i;
@@ -28,20 +28,18 @@ fn two_sum(nums: &Vec<u32>, target: u32) -> (u32, u32) {
     unreachable!()
 }
 
-pub fn three_sum(nums: &mut Vec<u32>, target: u32) -> [u32; 3] {
-    nums.sort();
+pub fn three_sum(nums: &mut [u32], target: u32) -> [u32; 3] {
+    nums.sort_unstable();
     for (i, &x) in nums.iter().enumerate() {
         let sub_target = target - x;
         let mut l = i + 1;
         let mut r = nums.len() - 1;
         while l < r {
             let sum = nums[l] + nums[r];
-            if sum > sub_target {
-                r -= 1;
-            } else if sum < sub_target {
-                l += 1;
-            } else {
-                return [x, nums[l], nums[r]];
+            match sum.cmp(&sub_target) {
+                std::cmp::Ordering::Equal => return [x, nums[l], nums[r]],
+                std::cmp::Ordering::Less => l += 1,
+                std::cmp::Ordering::Greater => r -= 1,
             }
         }
     }
