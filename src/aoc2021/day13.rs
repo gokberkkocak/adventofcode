@@ -124,7 +124,7 @@ impl std::fmt::Display for Instruction {
         for y in 0..=self.max_point.y {
             for x in 0..=self.max_point.x {
                 if self.points.contains(&Point::new(x, y)) {
-                    s.push('#');
+                    s.push('█');
                 } else {
                     s.push('.');
                 }
@@ -152,11 +152,11 @@ mod tests {
         let input = crate::util::read_file("inputs/2021_13_test.in");
         let mut ins = parse(&input);
         let p2 = part2(&mut ins);
-        let res = "#####\n\
-                        #...#\n\
-                        #...#\n\
-                        #...#\n\
-                        #####\n\
+        let res = "█████\n\
+                        █...█\n\
+                        █...█\n\
+                        █...█\n\
+                        █████\n\
                         .....\n\
                         .....\n";
         assert_eq!(p2, res);
