@@ -89,13 +89,13 @@ fn a_star(
     opened.push(starting_point);
     while let Some(current) = opened.pop() {
         if current.x == finish.0 && current.y == finish.1 {
-            return current.cost + get_point_cost(mat, current.x, current.y) - mat[0][0];
+            return current.cost;
         }
         closed.insert((current.x, current.y));
-        let new_cost = current.cost + get_point_cost(mat, current.x, current.y);
         for n in get_neighbour_indexes(mat, current.x, current.y, expand_mat)
             .filter(|n| !closed.contains(&(n.0, n.1)))
         {
+            let new_cost = current.cost + get_point_cost(mat, n.0, n.1);
             // check it is worse than cheapest path
             if let Some(cost) = cheapest_cost_map.get(&n) {
                 if new_cost >= *cost {
