@@ -17,21 +17,13 @@ pub(crate) fn run() {
 fn part1(mat: &[Vec<usize>]) -> usize {
     let start = (0, 0);
     let finish = (mat.len() - 1, mat.len() - 1);
-    if let Some(score) = a_star(mat, start, finish, false) {
-        score
-    } else {
-        unreachable!()
-    }
+    a_star(mat, start, finish, false)
 }
 
 fn part2(mat: &[Vec<usize>]) -> usize {
     let start = (0, 0);
     let finish = (mat.len() * 5 - 1, mat.len() * 5 - 1);
-    if let Some(score) = a_star(mat, start, finish, true) {
-        score
-    } else {
-        unreachable!()
-    }
+    a_star(mat, start, finish, true)
 }
 
 fn parse(input: &str) -> Vec<Vec<usize>> {
@@ -88,7 +80,7 @@ fn a_star(
     start: (usize, usize),
     finish: (usize, usize),
     expand_mat: bool,
-) -> Option<usize> {
+) -> usize {
     let mut opened = BinaryHeap::new();
     let mut closed = FxHashSet::default();
     let mut cheapest_cost_map = FxHashMap::default();
@@ -97,7 +89,7 @@ fn a_star(
     opened.push(starting_point);
     while let Some(current) = opened.pop() {
         if current.x == finish.0 && current.y == finish.1 {
-            return Some(current.cost + get_point_cost(mat, current.x, current.y) - mat[0][0]);
+            return current.cost + get_point_cost(mat, current.x, current.y) - mat[0][0];
         }
         closed.insert((current.x, current.y));
         let new_cost = current.cost + get_point_cost(mat, current.x, current.y);
@@ -115,7 +107,7 @@ fn a_star(
             opened.push(new_p);
         }
     }
-    None
+    unreachable!()
 }
 
 fn get_point_cost(mat: &[Vec<usize>], x: usize, y: usize) -> usize {
