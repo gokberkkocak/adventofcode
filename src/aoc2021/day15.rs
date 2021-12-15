@@ -97,10 +97,8 @@ fn a_star(
         {
             let new_cost = current.cost + get_point_cost(mat, n.0, n.1);
             // check it is worse than cheapest path
-            if let Some(cost) = cheapest_cost_map.get(&n) {
-                if new_cost >= *cost {
-                    continue;
-                }
+            if cheapest_cost_map.get(&n).filter(|&c| *c <= new_cost).is_some() {
+                continue;
             }
             cheapest_cost_map.insert(n, new_cost);
             let new_p = Point::new(n.0, n.1, new_cost, manhattan_distance(n, finish));
