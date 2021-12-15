@@ -135,8 +135,8 @@ fn get_neighbour_indexes(
     y: usize,
     expand_mat: bool,
 ) -> impl Iterator<Item = (usize, usize)> {
-    // 5 times the map for first problem
     let mut len = mat.len() as isize;
+    // expand the mat if needed
     if expand_mat {
         len *= 5;
     }
