@@ -37,8 +37,16 @@ fn parse(input: &str) -> Vec<Vec<usize>> {
         .collect()
 }
 
-fn manhattan_distance(pa: (usize, usize), pb: (usize, usize)) -> usize {
-    ((pb.0 as isize - pa.0 as isize).abs() + (pb.1 as isize - pa.1 as isize).abs()) as usize
+fn manhattan_distance(p_1: (usize, usize), p_2: (usize, usize)) -> usize {
+    ((p_2.0 as isize - p_1.0 as isize).abs() + (p_2.1 as isize - p_1.1 as isize).abs()) as usize
+}
+
+#[allow(dead_code)]
+fn euclidean_distance(p_1: (usize, usize), p_2: (usize, usize)) -> usize {
+    (((p_2.0 as isize - p_1.0 as isize).abs().pow(2)
+        + (p_2.1 as isize - p_1.1 as isize).abs().pow(2)) as f64)
+        .sqrt()
+        .round() as usize
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -95,13 +103,17 @@ fn a_star(
         for n in get_neighbour_indexes(mat, current.x, current.y, expand_mat)
             .filter(|n| !closed.contains(&(n.0, n.1)))
         {
-            let new_cost = current.cost + get_point_cost(mat, n.0, n.1);
+            let n_cost = current.cost + get_point_cost(mat, n.0, n.1);
             // check it is worse than cheapest path
-            if cheapest_cost_map.get(&n).filter(|&c| *c <= new_cost).is_some() {
+            if cheapest_cost_map
+                .get(&n)
+                .filter(|&c| *c <= n_cost)
+                .is_some()
+            {
                 continue;
             }
-            cheapest_cost_map.insert(n, new_cost);
-            let new_p = Point::new(n.0, n.1, new_cost, manhattan_distance(n, finish));
+            cheapest_cost_map.insert(n, n_cost);
+            let new_p = Point::new(n.0, n.1, n_cost, manhattan_distance(n, finish));
             opened.push(new_p);
         }
     }
