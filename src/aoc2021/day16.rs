@@ -2,41 +2,41 @@ use bitvec::vec::BitVec;
 
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 16);
-    let package = parse(&input);
-    let p1 = sum_versions(&package);
+    let packet = parse(&input);
+    let p1 = sum_versions(&packet);
     println!("Part 1: {}", p1);
-    let p2 = evaluate(&package);
+    let p2 = evaluate(&packet);
     println!("Part 1: {}", p2);
 }
 
-fn sum_versions(package: &Package) -> usize {
-    let sub = match &package.inner_package {
-        InnerPackage::Literal(_) => 0,
-        InnerPackage::Operator(op) => op.sub_packages.iter().map(sum_versions).sum::<usize>(),
+fn sum_versions(packet: &Packet) -> usize {
+    let sub = match &packet.inner_packet {
+        InnerPacket::Literal(_) => 0,
+        InnerPacket::Operator(op) => op.sub_packets.iter().map(sum_versions).sum::<usize>(),
     };
-    sub + package.version
+    sub + packet.version
 }
 
-fn evaluate(package: &Package) -> usize {
-    match &package.inner_package {
-        InnerPackage::Literal(l) => l.value,
-        InnerPackage::Operator(op) => {
-            let mut sub_packages_values = op.sub_packages.iter().map(evaluate);
+fn evaluate(packet: &Packet) -> usize {
+    match &packet.inner_packet {
+        InnerPacket::Literal(l) => l.value,
+        InnerPacket::Operator(op) => {
+            let mut sub_packet_values = op.sub_packets.iter().map(evaluate);
             match op.type_id {
-                0 => sub_packages_values.sum(),
-                1 => sub_packages_values.product(),
-                2 => sub_packages_values.min().unwrap(),
-                3 => sub_packages_values.max().unwrap(),
+                0 => sub_packet_values.sum(),
+                1 => sub_packet_values.product(),
+                2 => sub_packet_values.min().unwrap(),
+                3 => sub_packet_values.max().unwrap(),
                 5 => {
-                    (sub_packages_values.next().unwrap() > sub_packages_values.next().unwrap())
+                    (sub_packet_values.next().unwrap() > sub_packet_values.next().unwrap())
                         as usize
                 }
                 6 => {
-                    (sub_packages_values.next().unwrap() < sub_packages_values.next().unwrap())
+                    (sub_packet_values.next().unwrap() < sub_packet_values.next().unwrap())
                         as usize
                 }
                 7 => {
-                    (sub_packages_values.next().unwrap() == sub_packages_values.next().unwrap())
+                    (sub_packet_values.next().unwrap() == sub_packet_values.next().unwrap())
                         as usize
                 }
                 _ => unreachable!(),
@@ -46,27 +46,27 @@ fn evaluate(package: &Package) -> usize {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Package {
+struct Packet {
     version: usize,
-    inner_package: InnerPackage,
+    inner_packet: InnerPacket,
 }
 
-impl Package {
-    fn new(version: usize, inner_package: InnerPackage) -> Package {
-        Package {
+impl Packet {
+    fn new(version: usize, inner_packet: InnerPacket) -> Packet {
+        Packet {
             version,
-            inner_package,
+            inner_packet,
         }
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct LiteralPackage {
+struct LiteralPacket {
     value: usize,
 }
 
-impl LiteralPackage {
-    fn new(bv: &BitVec, i: &mut usize) -> LiteralPackage {
+impl LiteralPacket {
+    fn new(bv: &BitVec, i: &mut usize) -> LiteralPacket {
         let mut value_bv = BitVec::new();
         let mut read_more = true;
         while read_more {
@@ -80,44 +80,44 @@ impl LiteralPackage {
         let mut value_i = 0;
         let value_len = value_bv.len();
         let value = read_number(&value_bv, &mut value_i, value_len);
-        LiteralPackage { value }
+        LiteralPacket { value }
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct OperatorPackage {
+struct OperatorPacket {
     type_id: usize,
     length_type_id: LengthTypeId,
-    sub_packages: Vec<Package>,
+    sub_packets: Vec<Packet>,
 }
 
-impl OperatorPackage {
-    fn new(bv: &BitVec, type_id: usize, i: &mut usize) -> OperatorPackage {
+impl OperatorPacket {
+    fn new(bv: &BitVec, type_id: usize, i: &mut usize) -> OperatorPacket {
         let length_type = bv[*i];
         *i += 1;
         let length_type_id = match length_type {
             false => LengthTypeId::LengthOfSub(read_number(bv, i, 15)),
             true => LengthTypeId::NumberOfSub(read_number(bv, i, 11)),
         };
-        let mut sub_packages = Vec::new();
+        let mut sub_packets = Vec::new();
         match length_type_id {
             LengthTypeId::LengthOfSub(total_length) => {
-                let starting_bit_location = *i; // for subpackages
+                let starting_bit_location = *i;
                 while total_length != *i - starting_bit_location {
-                    sub_packages.push(parse_package(bv, i));
+                    sub_packets.push(parse_packet(bv, i));
                 }
             }
             LengthTypeId::NumberOfSub(number) => {
                 for _ in 0..number {
-                    sub_packages.push(parse_package(bv, i));
+                    sub_packets.push(parse_packet(bv, i));
                 }
             }
         }
 
-        OperatorPackage {
+        OperatorPacket {
             type_id,
             length_type_id,
-            sub_packages,
+            sub_packets,
         }
     }
 }
@@ -129,29 +129,29 @@ enum LengthTypeId {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-enum InnerPackage {
-    Literal(LiteralPackage),
-    Operator(OperatorPackage),
+enum InnerPacket {
+    Literal(LiteralPacket),
+    Operator(OperatorPacket),
 }
 
-impl InnerPackage {
+impl InnerPacket {
     #[allow(dead_code)]
-    fn is_inner_package(&self) -> bool {
+    fn is_inner_packet(&self) -> bool {
         match self {
-            InnerPackage::Literal(_) => true,
-            InnerPackage::Operator(_) => false,
+            InnerPacket::Literal(_) => true,
+            InnerPacket::Operator(_) => false,
         }
     }
     #[allow(dead_code)]
-    fn is_operator_package(&self) -> bool {
+    fn is_operator_packet(&self) -> bool {
         match self {
-            InnerPackage::Literal(_) => false,
-            InnerPackage::Operator(_) => true,
+            InnerPacket::Literal(_) => false,
+            InnerPacket::Operator(_) => true,
         }
     }
 }
 
-fn parse(input: &str) -> Package {
+fn parse(input: &str) -> Packet {
     let mut bv = BitVec::new();
     input
         .chars()
@@ -162,7 +162,7 @@ fn parse(input: &str) -> Package {
         })
         .for_each(|b| bv.push(b));
     let mut i = 0;
-    parse_package(&bv, &mut i)
+    parse_packet(&bv, &mut i)
 }
 
 fn read_number(bv: &BitVec, i: &mut usize, nb_bits: usize) -> usize {
@@ -176,15 +176,15 @@ fn read_number(bv: &BitVec, i: &mut usize, nb_bits: usize) -> usize {
     value
 }
 
-fn parse_package(bv: &BitVec, i: &mut usize) -> Package {
+fn parse_packet(bv: &BitVec, i: &mut usize) -> Packet {
     debug_assert!(bv.len() - *i >= 11);
     let version = read_number(bv, i, 3);
     let type_id = read_number(bv, i, 3);
     match type_id {
-        4 => Package::new(version, InnerPackage::Literal(LiteralPackage::new(bv, i))),
-        _ => Package::new(
+        4 => Packet::new(version, InnerPacket::Literal(LiteralPacket::new(bv, i))),
+        _ => Packet::new(
             version,
-            InnerPackage::Operator(OperatorPackage::new(bv, type_id, i)),
+            InnerPacket::Operator(OperatorPacket::new(bv, type_id, i)),
         ),
     }
 }
@@ -199,30 +199,30 @@ mod tests {
         let input = "D2FE28";
         let v = parse(&input);
         assert_eq!(v.version, 6);
-        assert_eq!(v.inner_package.is_inner_package(), true);
+        assert_eq!(v.inner_packet.is_inner_packet(), true);
         assert_eq!(
-            v.inner_package,
-            InnerPackage::Literal(LiteralPackage { value: 2021 })
+            v.inner_packet,
+            InnerPacket::Literal(LiteralPacket { value: 2021 })
         );
     }
     #[test]
     fn test_1_2() {
         let input = "38006F45291200";
         let v = parse(&input);
-        assert_eq!(v.inner_package.is_operator_package(), true);
-        match &v.inner_package {
-            InnerPackage::Literal(_) => panic!("should be operator"),
-            InnerPackage::Operator(op) => {
-                assert!(op.sub_packages.len() == 2);
-                assert_eq!(op.sub_packages[0].inner_package.is_inner_package(), true);
+        assert_eq!(v.inner_packet.is_operator_packet(), true);
+        match &v.inner_packet {
+            InnerPacket::Literal(_) => panic!("should be operator"),
+            InnerPacket::Operator(op) => {
+                assert!(op.sub_packets.len() == 2);
+                assert_eq!(op.sub_packets[0].inner_packet.is_inner_packet(), true);
                 assert_eq!(
-                    op.sub_packages[0].inner_package,
-                    InnerPackage::Literal(LiteralPackage { value: 10 })
+                    op.sub_packets[0].inner_packet,
+                    InnerPacket::Literal(LiteralPacket { value: 10 })
                 );
-                assert_eq!(op.sub_packages[1].inner_package.is_inner_package(), true);
+                assert_eq!(op.sub_packets[1].inner_packet.is_inner_packet(), true);
                 assert_eq!(
-                    op.sub_packages[1].inner_package,
-                    InnerPackage::Literal(LiteralPackage { value: 20 })
+                    op.sub_packets[1].inner_packet,
+                    InnerPacket::Literal(LiteralPacket { value: 20 })
                 );
             }
         }
@@ -232,25 +232,25 @@ mod tests {
     fn test_1_3() {
         let input = "EE00D40C823060";
         let v = parse(&input);
-        assert_eq!(v.inner_package.is_operator_package(), true);
-        match &v.inner_package {
-            InnerPackage::Literal(_) => panic!("should be operator"),
-            InnerPackage::Operator(op) => {
-                assert!(op.sub_packages.len() == 3);
-                assert_eq!(op.sub_packages[0].inner_package.is_inner_package(), true);
+        assert_eq!(v.inner_packet.is_operator_packet(), true);
+        match &v.inner_packet {
+            InnerPacket::Literal(_) => panic!("should be operator"),
+            InnerPacket::Operator(op) => {
+                assert!(op.sub_packets.len() == 3);
+                assert_eq!(op.sub_packets[0].inner_packet.is_inner_packet(), true);
                 assert_eq!(
-                    op.sub_packages[0].inner_package,
-                    InnerPackage::Literal(LiteralPackage { value: 1 })
+                    op.sub_packets[0].inner_packet,
+                    InnerPacket::Literal(LiteralPacket { value: 1 })
                 );
-                assert_eq!(op.sub_packages[1].inner_package.is_inner_package(), true);
+                assert_eq!(op.sub_packets[1].inner_packet.is_inner_packet(), true);
                 assert_eq!(
-                    op.sub_packages[1].inner_package,
-                    InnerPackage::Literal(LiteralPackage { value: 2 })
+                    op.sub_packets[1].inner_packet,
+                    InnerPacket::Literal(LiteralPacket { value: 2 })
                 );
-                assert_eq!(op.sub_packages[2].inner_package.is_inner_package(), true);
+                assert_eq!(op.sub_packets[2].inner_packet.is_inner_packet(), true);
                 assert_eq!(
-                    op.sub_packages[2].inner_package,
-                    InnerPackage::Literal(LiteralPackage { value: 3 })
+                    op.sub_packets[2].inner_packet,
+                    InnerPacket::Literal(LiteralPacket { value: 3 })
                 );
             }
         }
