@@ -1,4 +1,4 @@
-use bit_vec::BitVec;
+use bitvec::vec::BitVec;
 
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 16);
