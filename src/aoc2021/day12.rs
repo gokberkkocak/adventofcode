@@ -1,4 +1,4 @@
-use ahash::{AHashMap, AHasher};
+use fxhash::{FxHashMap, FxHasher};
 use std::hash::{Hash, Hasher};
 
 pub(crate) fn run() {
@@ -11,7 +11,7 @@ pub(crate) fn run() {
 }
 
 fn parse(input: &str) -> Graph {
-    let mut edges = AHashMap::new();
+    let mut edges = FxHashMap::default();
     input
         .lines()
         .map(|line| {
@@ -48,18 +48,18 @@ impl Node {
         } else if s == "end" {
             Node::End
         } else if s.chars().next().unwrap().is_lowercase() {
-            let mut hs = AHasher::default();
+            let mut hs = FxHasher::default();
             s.hash(&mut hs);
             Node::Small(hs.finish())
         } else {
-            let mut hs = AHasher::default();
+            let mut hs = FxHasher::default();
             s.hash(&mut hs);
             Node::Big(hs.finish())
         }
     }
 }
 struct Graph {
-    edges: AHashMap<Node, Vec<Node>>,
+    edges: FxHashMap<Node, Vec<Node>>,
 }
 
 impl Graph {
