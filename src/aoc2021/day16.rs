@@ -28,25 +28,16 @@ fn evaluate(package: &Package) -> usize {
                 2 => sub_packages_values.min().unwrap(),
                 3 => sub_packages_values.max().unwrap(),
                 5 => {
-                    if sub_packages_values.next().unwrap() > sub_packages_values.next().unwrap() {
-                        1
-                    } else {
-                        0
-                    }
+                    (sub_packages_values.next().unwrap() > sub_packages_values.next().unwrap())
+                        as usize
                 }
                 6 => {
-                    if sub_packages_values.next().unwrap() < sub_packages_values.next().unwrap() {
-                        1
-                    } else {
-                        0
-                    }
+                    (sub_packages_values.next().unwrap() < sub_packages_values.next().unwrap())
+                        as usize
                 }
                 7 => {
-                    if sub_packages_values.next().unwrap() == sub_packages_values.next().unwrap() {
-                        1
-                    } else {
-                        0
-                    }
+                    (sub_packages_values.next().unwrap() == sub_packages_values.next().unwrap())
+                        as usize
                 }
                 _ => unreachable!(),
             }
