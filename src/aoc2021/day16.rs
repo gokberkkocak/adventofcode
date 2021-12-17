@@ -150,14 +150,13 @@ impl InnerPacket {
 }
 
 fn parse(input: &str) -> Packet {
-    let mut bv = BitVec::with_capacity(input.len() * 4);
-    input
+    let bv = input
         .chars()
         .flat_map(|c| {
             let num = c.to_digit(16).unwrap() as u8;
             (0..4).rev().map(move |i| (num >> i) & 1 == 1)
         })
-        .for_each(|b| bv.push(b));
+        .collect();
     let mut i = 0;
     parse_packet(&bv, &mut i)
 }
