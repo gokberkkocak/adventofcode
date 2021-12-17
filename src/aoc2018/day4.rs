@@ -34,9 +34,9 @@ impl Sleep {
     }
     fn calculate_sleep(&mut self) {
         assert_eq!(self.sleep_start.len(), self.sleep_end.len());
-        let mut p = self.sleep_start.iter();
+        let p = self.sleep_start.iter();
         let mut q = self.sleep_end.iter();
-        while let Some(start) = p.next() {
+        for start in p {
             if let Some(end) = q.next() {
                 for i in *start..*end {
                     self.sleep_time[i as usize] = true;
@@ -60,7 +60,7 @@ impl GuardSleep {
             sleep_data: vec![0; 60],
         }
     }
-    fn add_new_data(&mut self, given_sleep_data: &Vec<bool>) {
+    fn add_new_data(&mut self, given_sleep_data: &[bool]) {
         assert_eq!(given_sleep_data.len(), self.sleep_data.len());
         for (i, flag) in given_sleep_data.iter().enumerate() {
             if *flag {
@@ -81,7 +81,9 @@ pub fn run() {
             let date = NaiveDateTime::parse_from_str(&date, "%Y-%m-%d %H:%M:%S").unwrap();
             let date = time_adjust(date);
             let day_id = get_day(&date);
-            let day_data = sleep_data.entry(day_id).or_insert(Sleep::new(day_id));
+            let day_data = sleep_data
+                .entry(day_id)
+                .or_insert_with(|| Sleep::new(day_id));
             let minute = get_time(&date) as u8;
             if let Some(action) = iter.next() {
                 if action.starts_with("falls") {
@@ -100,15 +102,15 @@ pub fn run() {
     }
 
     let mut guard_sleep_data: HashMap<u16, GuardSleep> = HashMap::new();
-    for (_, v) in &mut sleep_data {
+    for v in sleep_data.values_mut() {
         v.calculate_sleep();
         let guard = guard_sleep_data
             .entry(v.id.unwrap())
-            .or_insert(GuardSleep::new(v.id.unwrap()));
+            .or_insert_with(|| GuardSleep::new(v.id.unwrap()));
         guard.add_new_data(&v.sleep_time);
     }
 
-    for (_g, v) in &guard_sleep_data {
+    for v in guard_sleep_data.values() {
         println!("{} {} {:?}", v.id, v.total_sleep_time, v.sleep_data);
     }
 
@@ -121,7 +123,7 @@ fn time_adjust(date: NaiveDateTime) -> NaiveDateTime {
         let new_date = date.date() + Duration::days(1);
         return new_date.and_hms(0, 0, 0);
     }
-    return date;
+    date
 }
 
 fn get_day(date: &NaiveDateTime) -> (i32, u32, u32) {

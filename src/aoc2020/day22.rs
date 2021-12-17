@@ -89,12 +89,10 @@ impl GameBoard {
                 let sub_p2 = Player::new(self.p2.cards.iter().take(p2_card).copied().collect());
                 let mut sub_game = GameBoard::new(sub_p1, sub_p2);
                 sub_game.play_recursive_combat()
+            } else if p1_card > p2_card {
+                0
             } else {
-                if p1_card > p2_card {
-                    0
-                } else {
-                    1
-                }
+                1
             };
             if round_winner == 0 {
                 self.p1.cards.extend(&[p1_card as u8, p2_card as u8]);

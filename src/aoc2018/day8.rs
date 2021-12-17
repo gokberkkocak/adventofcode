@@ -109,7 +109,7 @@ fn count_ref_metadata(node: &Node) -> usize {
                     if m_id - 1 < children.len() {
                         sum += *s
                             .entry(m_id)
-                            .or_insert(count_ref_metadata(&children[m_id - 1]));
+                            .or_insert_with(|| count_ref_metadata(&children[m_id - 1]));
                     }
                 }
             }

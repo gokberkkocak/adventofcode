@@ -93,7 +93,7 @@ impl fmt::Display for Graph {
             for cell in row {
                 write!(f, "{}", cell)?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }

@@ -16,9 +16,9 @@ pub fn run() {
         let task = line[1];
         task_precedence
             .entry(task)
-            .or_insert(HashSet::new())
+            .or_insert_with(HashSet::new)
             .insert(pre);
-        let _ = task_precedence.entry(pre).or_insert(HashSet::new()); //also push for pre task as well if a task has never have pre
+        let _ = task_precedence.entry(pre).or_insert_with(HashSet::new); //also push for pre task as well if a task has never have pre
     }
     // println!("{:?}", task_precedence);
     part_2(&mut task_precedence);
@@ -31,7 +31,7 @@ fn part_1(task_precedence: &mut HashMap<u8, HashSet<u8>>) {
     while result.len() != n {
         let next = *task_precedence
             .iter()
-            .filter(|&(_, pre)| pre.len() == 0)
+            .filter(|&(_, pre)| pre.is_empty())
             .min_by_key(|&(task, _)| *task)
             .unwrap()
             .0;
@@ -54,7 +54,7 @@ fn part_2(task_precedence: &mut HashMap<u8, HashSet<u8>>) {
     while result.len() != n {
         while let Some(next_task) = task_precedence
             .iter()
-            .filter(|&(_, pre)| pre.len() == 0)
+            .filter(|&(_, pre)| pre.is_empty())
             .map(|(&t, _)| t)
             .next()
         {
@@ -96,7 +96,7 @@ fn part_2(task_precedence: &mut HashMap<u8, HashSet<u8>>) {
             }
         }
         task_precedence.iter_mut().for_each(|(_, pre)| {
-            pre.remove(&task);
+            pre.remove(task);
         });
         let task = *task;
         task_finish.remove(&task);

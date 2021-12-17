@@ -56,9 +56,9 @@ pub fn run() {
     let mut board = vec![vec![" "; 62]; 15];
     v.iter()
         .for_each(|p| board[p.y as usize - 140][p.x as usize - 167] = "X");
-    for i in 0..15 {
-        for j in 0..62 {
-            print!("{}", board[i][j]);
+    for i in board.iter_mut() {
+        for j in i {
+            print!("{}", *j);
         }
         println!();
     }

@@ -36,34 +36,33 @@ pub fn run() {
         l.next();
         let mut skips = l.next().unwrap();
         skips = &skips[0..skips.len() - 1];
-        let mut m = skips.split(",");
+        let mut m = skips.split(',');
         s_x = m.next().unwrap().parse().unwrap();
         s_y = m.next().unwrap().parse().unwrap();
         let dims = l.next().unwrap();
-        let mut k = dims.split("x");
+        let mut k = dims.split('x');
         x = k.next().unwrap().parse().unwrap();
         y = k.next().unwrap().parse().unwrap();
-        for i in s_x..x + s_x {
-            for j in s_y..y + s_y {
-                //println!("{} {}" , i ,j);
-                if matrix[i][j].value == 0 {
-                    matrix[i][j].value = 1;
-                    matrix[i][j].owners.push(id.to_string());
-                } else if matrix[i][j].value == 1 {
+        for i in matrix.iter_mut().skip(s_x).take(x) {
+            for j in i.iter_mut().skip(s_y).take(y) {
+                if j.value == 0 {
+                    j.value = 1;
+                    j.owners.push(id.to_string());
+                } else if j.value == 1 {
                     count += 1;
-                    matrix[i][j].owners.push(id.to_string());
-                    matrix[i][j].value = 2;
+                    j.owners.push(id.to_string());
+                    j.value = 2;
                 } else {
-                    matrix[i][j].owners.push(id.to_string());
+                    j.owners.push(id.to_string());
                 }
             }
         }
     }
 
-    for i in 0..1000 {
-        for j in 0..1000 {
-            if matrix[i][j].value > 1 {
-                for o in matrix[i][j].owners.iter() {
+    for i in matrix.iter_mut() {
+        for j in i {
+            if j.value > 1 {
+                for o in j.owners.iter() {
                     if ids.contains(o) {
                         ids.remove(o);
                     }

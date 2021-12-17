@@ -17,7 +17,7 @@ fn part2(input: &str) -> Point {
 }
 
 fn solve(input: &str, strategy: Strategy) -> Point {
-    let (roads, mut carts) = parse(&input, strategy);
+    let (roads, mut carts) = parse(input, strategy);
     loop {
         if let Some(p) = carts.apply_step(&roads) {
             return p;
@@ -70,10 +70,10 @@ impl Cart {
         let next_point;
         match self.facing {
             Facing::Up => {
-                next_point = Point::new(self.location.x as isize, self.location.y - 1 as isize);
+                next_point = Point::new(self.location.x as isize, self.location.y - 1_isize);
             }
             Facing::Down => {
-                next_point = Point::new(self.location.x as isize, self.location.y + 1 as isize);
+                next_point = Point::new(self.location.x as isize, self.location.y + 1_isize);
             }
             Facing::Left => {
                 next_point = Point::new(self.location.x as isize - 1, self.location.y as isize);
@@ -112,8 +112,7 @@ impl Cart {
                 let next_next_point = road
                     .connections
                     .iter()
-                    .filter(|&&r| r != self.location)
-                    .next()
+                    .find(|&&r| r != self.location)
                     .unwrap();
                 match (
                     next_next_point.x - next_point.x,

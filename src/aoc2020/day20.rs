@@ -102,7 +102,8 @@ struct WholeImage {
 }
 
 impl WholeImage {
-    fn construct(mut tiles: Vec<Tile>) -> Self {
+    fn construct(tiles: Vec<Tile>) -> Self {
+        #[allow(clippy::too_many_arguments)]
         fn solve(
             x_min: isize,
             x_max: isize,
@@ -210,7 +211,7 @@ impl WholeImage {
         }
         seen.insert(id);
         image.insert((0, 0), tiles[0].clone());
-        let ret = solve(0, 0, 0, 0, &mut image, &mut tiles, &all_v, &mut seen, len);
+        let ret = solve(0, 0, 0, 0, &mut image, &tiles, &all_v, &mut seen, len);
         debug_assert!(ret);
         let x_min = image.iter().map(|(&(x, _y), _)| x).min().unwrap();
         let x_max = image.iter().map(|(&(x, _y), _)| x).max().unwrap();

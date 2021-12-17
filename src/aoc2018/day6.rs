@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
 
 use crate::util::get_puzzle_input;
 
@@ -21,12 +21,12 @@ pub fn run() {
     let x_len = x_max - x_min + 1;
     let y_len = y_max - y_min + 1;
     for (i, j) in &mut locs {
-        *i = *i - x_min;
-        *j = *j - y_min;
+        *i -= x_min;
+        *j -= y_min;
     }
 
     let mut board = vec![vec![".".to_string(); y_len as usize]; x_len as usize];
-    part1(&mut board, &mut locs);
+    part1(&mut board, &locs);
     part2(&board, &locs);
 }
 
@@ -34,18 +34,22 @@ pub fn calculate_man_distance(p1: (u32, u32), p2: (u32, u32)) -> u64 {
     ((p1.0 as i64 - p2.0 as i64).abs() + (p1.1 as i64 - p2.1 as i64).abs()) as u64
 }
 
-pub fn part1(board: &mut Vec<Vec<String>>, locs: &Vec<(u32, u32)>) {
+pub fn part1(board: &mut [Vec<String>], locs: &[(u32, u32)]) {
     for (i, v) in board.iter_mut().enumerate() {
         for (j, s) in v.iter_mut().enumerate() {
             let mut min_distance = u64::MAX;
             let mut winner: Option<usize> = None;
             for (index, l) in locs.iter().enumerate() {
                 let d = calculate_man_distance((i as u32, j as u32), *l);
-                if d < min_distance {
-                    winner = Some(index);
-                    min_distance = d;
-                } else if d == min_distance {
-                    winner = None;
+                match d.cmp(&min_distance) {
+                    Ordering::Greater => {}
+                    Ordering::Less => {
+                        winner = Some(index);
+                        min_distance = d;
+                    }
+                    Ordering::Equal => {
+                        winner = None;
+                    }
                 }
             }
             if let Some(winner) = winner {
@@ -82,7 +86,7 @@ pub fn part1(board: &mut Vec<Vec<String>>, locs: &Vec<(u32, u32)>) {
     println!("p1 {}", max.1.unwrap());
 }
 
-pub fn part2(board: &Vec<Vec<String>>, locs: &Vec<(u32, u32)>) {
+pub fn part2(board: &[Vec<String>], locs: &[(u32, u32)]) {
     let max_allowed = 10000;
     let mut count = 0;
     for (i, v) in board.iter().enumerate() {

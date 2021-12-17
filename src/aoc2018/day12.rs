@@ -41,14 +41,14 @@ impl Garden {
             }
         }
         let mut clone_state = vec![false; self.state.len()];
-        for i in 2..self.state.len() - 2 {
+        for (i, item) in clone_state.iter_mut().enumerate().take(self.state.len() - 2).skip(2) {
             if self
                 .rules
                 .get(&self.state[i - 2..=i + 2])
                 .filter(|&&b| b)
                 .is_some()
             {
-                clone_state[i] = true;
+                *item = true;
             }
         }
         self.state = clone_state;
@@ -88,7 +88,7 @@ trait MapToBoolVec {
 impl MapToBoolVec for &str {
     fn map_to_vec(&self) -> Vec<bool> {
         self.chars()
-            .map(|c| if c == '#' { true } else { false })
+            .map(|c| c == '#')
             .collect()
     }
 }
@@ -100,8 +100,7 @@ fn parse_input(input: &str) -> Garden {
         .next()
         .unwrap()
         .split(": ")
-        .skip(1)
-        .next()
+        .nth(1)
         .unwrap()
         .map_to_vec();
     for line in lines.skip(1) {

@@ -13,9 +13,9 @@ pub fn run() {
     }
     let mut flag = true;
     'big: loop {
-        for i in 0..freq_changes.len() {
+        for i in &freq_changes {
             seen.insert(sum);
-            sum = sum + freq_changes[i];
+            sum += i;
             if seen.contains(&sum) {
                 println!("part 2 sum {}", sum);
                 break 'big;
