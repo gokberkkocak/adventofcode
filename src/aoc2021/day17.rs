@@ -47,10 +47,10 @@ fn parse(input: &str) -> HitBox {
 }
 
 fn part1(hb: &HitBox) -> usize {
-    // when y=0 we have either v_y_init or -vy_init speed.
+    // when y=0 we have either v_y_init or -v_y_init speed.
     // on the way down, in next step we can have -v_y_init-1 speed and at maximum we can hit the bottom of the box with this speed.
     // any more than that and we will miss the target.
-    // v_x can get 0 eventually so before ay step before v_y_init+1 steps we can set x to correct zone and it will stay in it. 
+    // v_x can get 0 eventually so before any step before v_y_init+1 steps we can set x to correct zone with 0 velocity and it will stay in it.
     // so, y_min = -vy_init - 1
     let v_y_init_max = (-hb.y_min - 1).abs() as usize;
     // gauss sum for height
