@@ -156,9 +156,8 @@ fn parse(input: &str) -> Packet {
     input
         .chars()
         .flat_map(|c| {
-            (0..4)
-                .rev()
-                .map(move |i| (c.to_digit(16).unwrap() as u8 >> i) & 1 == 1)
+            let num = c.to_digit(16).unwrap() as u8;
+            (0..4).rev().map( move |i| (num >> i) & 1 == 1)
         })
         .for_each(|b| bv.push(b));
     let mut i = 0;
