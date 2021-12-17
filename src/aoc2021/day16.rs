@@ -28,12 +28,10 @@ fn evaluate(packet: &Packet) -> usize {
                 2 => sub_packet_values.min().unwrap(),
                 3 => sub_packet_values.max().unwrap(),
                 5 => {
-                    (sub_packet_values.next().unwrap() > sub_packet_values.next().unwrap())
-                        as usize
+                    (sub_packet_values.next().unwrap() > sub_packet_values.next().unwrap()) as usize
                 }
                 6 => {
-                    (sub_packet_values.next().unwrap() < sub_packet_values.next().unwrap())
-                        as usize
+                    (sub_packet_values.next().unwrap() < sub_packet_values.next().unwrap()) as usize
                 }
                 7 => {
                     (sub_packet_values.next().unwrap() == sub_packet_values.next().unwrap())
@@ -152,12 +150,12 @@ impl InnerPacket {
 }
 
 fn parse(input: &str) -> Packet {
-    let mut bv = BitVec::new();
+    let mut bv = BitVec::with_capacity(input.len() * 4);
     input
         .chars()
         .flat_map(|c| {
             let num = c.to_digit(16).unwrap() as u8;
-            (0..4).rev().map( move |i| (num >> i) & 1 == 1)
+            (0..4).rev().map(move |i| (num >> i) & 1 == 1)
         })
         .for_each(|b| bv.push(b));
     let mut i = 0;
