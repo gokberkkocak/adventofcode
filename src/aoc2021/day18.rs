@@ -79,26 +79,26 @@ impl Element {
         }
     }
 
-    fn split(self) -> (Element, bool) {
+    fn split(self) -> SplitResult {
         match self {
             Element::Value(n) => {
                 if n >= 10 {
-                    (
+                    SplitResult::new(
                         Element::new_pair(Element::Value(n / 2), Element::Value(n / 2 + n % 2)),
                         true,
                     )
                 } else {
-                    (self, false)
+                    SplitResult::new(self, false)
                 }
             }
 
-            Element::Pair(a, b) => {
-                let (new_a, has_split) = a.split();
-                if has_split {
-                    (Element::new_pair(new_a, *b), true)
+            Element::Pair(l, r) => {
+                let l_res = l.split();
+                if l_res.has_split {
+                    SplitResult::new(Element::new_pair(l_res.el, *r), true)
                 } else {
-                    let (new_b, has_split) = b.split();
-                    (Element::new_pair(new_a, new_b), has_split)
+                    let r_res = r.split();
+                    SplitResult::new(Element::new_pair(l_res.el, r_res.el), r_res.has_split)
                 }
             }
         }
@@ -106,14 +106,14 @@ impl Element {
 
     fn reduce(mut self) -> Element {
         loop {
-            let res = self.explode(0);
-            self = res.el;
-            if res.exploded {
+            let explode_res = self.explode(0);
+            self = explode_res.el;
+            if explode_res.exploded {
                 continue;
             }
-            let (new_el, has_split) = self.split();
-            self = new_el;
-            if has_split {
+            let split_res = self.split();
+            self = split_res.el;
+            if split_res.has_split {
                 continue;
             }
             break;
@@ -124,7 +124,7 @@ impl Element {
     fn magnitude(&self) -> usize {
         match self {
             Element::Value(n) => *n,
-            Element::Pair(a, b) => 3 * a.magnitude() + 2 * b.magnitude(),
+            Element::Pair(l, r) => 3 * l.magnitude() + 2 * r.magnitude(),
         }
     }
 }
@@ -144,6 +144,17 @@ impl ExplodeResult {
             r_add,
             exploded,
         }
+    }
+}
+
+struct SplitResult {
+    el: Element,
+    has_split: bool,
+}
+
+impl SplitResult {
+    fn new(el: Element, has_split: bool) -> Self {
+        SplitResult { el, has_split }
     }
 }
 
