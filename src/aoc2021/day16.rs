@@ -6,7 +6,7 @@ pub(crate) fn run() {
     let p1 = sum_versions(&packet);
     println!("Part 1: {}", p1);
     let p2 = evaluate(&packet);
-    println!("Part 1: {}", p2);
+    println!("Part 2: {}", p2);
 }
 
 fn sum_versions(packet: &Packet) -> usize {
