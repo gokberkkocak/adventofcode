@@ -4,7 +4,7 @@ pub(crate) fn run() {
     let p1 = part1(&hb);
     println!("Part 1: {}", p1);
     let p2 = part2(&hb);
-    println!("Part 1: {}", p2);
+    println!("Part 2: {}", p2);
 }
 
 struct HitBox {
