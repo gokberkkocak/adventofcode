@@ -22,22 +22,21 @@ fn evaluate(packet: &Packet) -> usize {
         InnerPacket::Literal(l) => l.value,
         InnerPacket::Operator(op) => {
             let mut sub_packet_values = op.sub_packets.iter().map(evaluate);
-            match op.type_id {
-                0 => sub_packet_values.sum(),
-                1 => sub_packet_values.product(),
-                2 => sub_packet_values.min().unwrap(),
-                3 => sub_packet_values.max().unwrap(),
-                5 => {
+            match &op.op_type {
+                OperationType::Sum => sub_packet_values.sum(),
+                OperationType::Product => sub_packet_values.product(),
+                OperationType::Min => sub_packet_values.min().unwrap(),
+                OperationType::Max => sub_packet_values.max().unwrap(),
+                OperationType::GreaterThan => {
                     (sub_packet_values.next().unwrap() > sub_packet_values.next().unwrap()) as usize
                 }
-                6 => {
+                OperationType::LessThan => {
                     (sub_packet_values.next().unwrap() < sub_packet_values.next().unwrap()) as usize
                 }
-                7 => {
+                OperationType::Equal => {
                     (sub_packet_values.next().unwrap() == sub_packet_values.next().unwrap())
                         as usize
                 }
-                _ => unreachable!(),
             }
         }
     }
@@ -84,8 +83,7 @@ impl LiteralPacket {
 
 #[derive(Debug, PartialEq, Eq)]
 struct OperatorPacket {
-    type_id: usize,
-    length_type_id: LengthTypeId,
+    op_type: OperationType,
     sub_packets: Vec<Packet>,
 }
 
@@ -111,11 +109,35 @@ impl OperatorPacket {
                 }
             }
         }
-
+        let op_type = OperationType::from(type_id);
         OperatorPacket {
-            type_id,
-            length_type_id,
+            op_type,
             sub_packets,
+        }
+    }
+}
+#[derive(Debug, PartialEq, Eq)]
+enum OperationType {
+    Sum = 0,
+    Product = 1,
+    Min = 2,
+    Max = 3,
+    GreaterThan = 5,
+    LessThan = 6,
+    Equal = 7,
+}
+
+impl From<usize> for OperationType {
+    fn from(i: usize) -> Self {
+        match i {
+            0 => OperationType::Sum,
+            1 => OperationType::Product,
+            2 => OperationType::Min,
+            3 => OperationType::Max,
+            5 => OperationType::GreaterThan,
+            6 => OperationType::LessThan,
+            7 => OperationType::Equal,
+            _ => unreachable!(),
         }
     }
 }
