@@ -4,7 +4,7 @@ use itertools::Itertools;
 pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 19);
     let mut plane = parse(&input);
-    plane.merge_scanners();
+    plane.merge_all_readings();
     let p1 = part1(&plane);
     println!("Part 1: {}", p1);
     let p2 = part2(&plane);
@@ -12,7 +12,7 @@ pub(crate) fn run() {
 }
 
 fn part1(plane: &Plane3D) -> usize {
-    plane.scanners.len()
+    plane.beacon_locations.len()
 }
 
 fn part2(plane: &Plane3D) -> usize {
@@ -89,7 +89,7 @@ fn parse(input: &str) -> Plane3D {
     println!("Somehow faster with this print\n{:?}", beacon_distance_sets);
     Plane3D {
         readings,
-        scanners,
+        beacon_locations: scanners,
         beacon_distance_sets,
         total_distances: vec![],
     }
@@ -97,18 +97,18 @@ fn parse(input: &str) -> Plane3D {
 
 struct Plane3D {
     readings: Vec<ScannerReading>,
-    scanners: FxHashSet<[i32; 3]>,
+    beacon_locations: FxHashSet<[i32; 3]>,
     beacon_distance_sets: Vec<FxHashSet<usize>>,
     total_distances: Vec<[i32; 3]>,
 }
 
 impl Plane3D {
-    fn merge_scanners(&mut self) {
+    fn merge_all_readings(&mut self) {
         let mut dists = vec![[0, 0, 0]];
         while !self.readings.is_empty() {
             for i in (0..self.readings.len()).rev() {
-                if let Some(d) = Plane3D::merge_scanner(
-                    &mut self.scanners,
+                if let Some(d) = Plane3D::merge_reading(
+                    &mut self.beacon_locations,
                     &mut self.beacon_distance_sets,
                     &self.readings[i],
                 ) {
@@ -120,8 +120,8 @@ impl Plane3D {
         self.total_distances.extend(dists);
     }
 
-    fn merge_scanner(
-        scanners: &mut FxHashSet<[i32; 3]>,
+    fn merge_reading(
+        beacon_locations: &mut FxHashSet<[i32; 3]>,
         beacon_distance_sets: &mut Vec<FxHashSet<usize>>,
         reading: &ScannerReading,
     ) -> Option<[i32; 3]> {
@@ -134,14 +134,13 @@ impl Plane3D {
         if enough_intersections == 0 {
             return None;
         }
-
         for r in 0..24 {
             let rotated = reading
                 .beacons
                 .iter()
                 .map(|&v| rotate(v, r))
                 .collect::<Vec<_>>();
-            let distances = scanners
+            let distances = beacon_locations
                 .iter()
                 .cartesian_product(&rotated)
                 .map(|([x1, y1, z1], [x2, y2, z2])| [x1 - x2, y1 - y2, z1 - z2]);
@@ -149,11 +148,11 @@ impl Plane3D {
                 let altered_rotated = rotated.iter().map(|[x, y, z]| [x + dx, y + dy, z + dz]);
                 if altered_rotated
                     .clone()
-                    .filter(|v| scanners.contains(v))
+                    .filter(|v| beacon_locations.contains(v))
                     .count()
                     >= 12
                 {
-                    scanners.extend(altered_rotated);
+                    beacon_locations.extend(altered_rotated);
                     beacon_distance_sets.push(reading.beacon_distance_set.clone());
                     return Some([dx, dy, dz]);
                 }
@@ -177,7 +176,7 @@ mod tests {
     fn test_1() {
         let input = crate::util::read_file("inputs/2021_19_test.in");
         let mut plane = parse(&input);
-        plane.merge_scanners();
+        plane.merge_all_readings();
         let p1 = part1(&plane);
         assert_eq!(p1, 79);
     }
@@ -186,7 +185,7 @@ mod tests {
     fn test_2() {
         let input = crate::util::read_file("inputs/2021_19_test.in");
         let mut plane = parse(&input);
-        plane.merge_scanners();
+        plane.merge_all_readings();
         let p2 = part2(&plane);
         assert_eq!(p2, 3621);
     }
