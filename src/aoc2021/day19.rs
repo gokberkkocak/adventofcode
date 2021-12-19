@@ -84,14 +84,15 @@ fn parse(input: &str) -> Plane3D {
         })
         .collect::<Vec<_>>();
     let first_scanner = readings.remove(0);
-    let scanners = first_scanner.beacons.into_iter().collect::<FxHashSet<_>>();
-    let beacon_distance_sets = vec![first_scanner.beacon_distance_set];
-    println!("Somehow faster with this print\n{:?}", beacon_distance_sets);
+    let beacon_locations = first_scanner.beacons.into_iter().collect::<FxHashSet<_>>();
+    let total_distances = Vec::with_capacity(readings.len());
+    let mut beacon_distance_sets = Vec::with_capacity(readings.len());
+    beacon_distance_sets.push(first_scanner.beacon_distance_set);
     Plane3D {
         readings,
-        beacon_locations: scanners,
+        beacon_locations,
         beacon_distance_sets,
-        total_distances: vec![],
+        total_distances,
     }
 }
 
