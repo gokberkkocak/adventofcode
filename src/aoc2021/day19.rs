@@ -105,7 +105,8 @@ struct Plane3D {
 
 impl Plane3D {
     fn merge_all_readings(&mut self) {
-        let mut dists = vec![[0, 0, 0]];
+        let mut total_distances = Vec::with_capacity(self.readings.len() + 1);
+        total_distances.push([0, 0, 0]);
         while !self.readings.is_empty() {
             for i in (0..self.readings.len()).rev() {
                 if let Some(d) = Plane3D::merge_reading(
@@ -113,12 +114,12 @@ impl Plane3D {
                     &mut self.beacon_distance_sets,
                     &self.readings[i],
                 ) {
-                    dists.push(d);
+                    total_distances.push(d);
                     self.readings.swap_remove(i);
                 }
             }
         }
-        self.total_distances.extend(dists);
+        self.total_distances.extend(total_distances);
     }
 
     fn merge_reading(
