@@ -127,11 +127,11 @@ impl Plane3D {
     ) -> Option<[i32; 3]> {
         // For at least 12 intersections with rotation, we need 12 choose 2 = 66 intersections of beacon distances.
         // We can skip impossible reading matches by checking this condition first.
-        let enough_intersections = beacon_distance_sets
+        let scanner_intersections = beacon_distance_sets
             .iter()
             .filter(|set| set.intersection(&reading.beacon_distance_set).count() >= 66)
             .count();
-        if enough_intersections == 0 {
+        if scanner_intersections == 0 {
             return None;
         }
         for r in 0..24 {
