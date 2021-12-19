@@ -21,84 +21,74 @@ impl Element {
         Element::Pair(Box::new(l), Box::new(r))
     }
 
-    fn add_left(self, val: Option<usize>) -> Element {
+    fn add_left(&mut self, val: Option<usize>) {
         match val {
-            None => self,
+            None => (),
             Some(v) => match self {
-                Element::Value(n) => Element::Value(n + v),
-                Element::Pair(a, b) => Element::new_pair(a.add_left(val), *b),
+                Element::Value(n) => *self = Element::Value(*n + v),
+                Element::Pair(l, _r) => {
+                    l.add_left(val);
+                }
             },
         }
     }
 
-    fn add_right(self, val: Option<usize>) -> Element {
+    fn add_right(&mut self, val: Option<usize>) {
         match val {
-            None => self,
+            None => (),
             Some(v) => match self {
-                Element::Value(n) => Element::Value(n + v),
-                Element::Pair(a, b) => Element::new_pair(*a, b.add_right(val)),
+                Element::Value(n) => *self = Element::Value(*n + v),
+                Element::Pair(_l, r) => {
+                    r.add_right(val);
+                }
             },
         }
     }
 
-    fn explode(self, depth: u8) -> ExplodeResult {
+    fn explode(&mut self, depth: u8) -> ExplodeResult {
         match self {
-            Element::Value(_) => ExplodeResult::new(self, None, None, false),
+            Element::Value(_) => ExplodeResult::new(None, None, false),
             Element::Pair(l, r) => {
                 if depth >= 4 {
-                    match (*l, *r) {
+                    match (*l.clone(), *r.clone()) {
                         (Element::Value(v_l), Element::Value(v_r)) => {
-                            return ExplodeResult::new(
-                                Element::Value(0),
-                                Some(v_l),
-                                Some(v_r),
-                                true,
-                            )
+                            *self = Element::Value(0);
+                            return ExplodeResult::new(Some(v_l), Some(v_r), true);
                         }
                         _ => unreachable!(),
                     }
                 }
                 let l_res = l.explode(depth + 1);
                 if l_res.exploded {
-                    ExplodeResult::new(
-                        Element::new_pair(l_res.el, r.add_left(l_res.r_add)),
-                        l_res.l_add,
-                        None,
-                        true,
-                    )
+                    r.add_left(l_res.r_add);
+                    ExplodeResult::new(l_res.l_add, None, true)
                 } else {
                     let r_res = r.explode(depth + 1);
-                    ExplodeResult::new(
-                        Element::new_pair(l_res.el.add_right(r_res.l_add), r_res.el),
-                        None,
-                        r_res.r_add,
-                        r_res.exploded,
-                    )
+                    l.add_right(r_res.l_add);
+                    ExplodeResult::new(None, r_res.r_add, r_res.exploded)
                 }
             }
         }
     }
 
-    fn split(self) -> SplitResult {
+    fn split(&mut self) -> bool {
         match self {
             Element::Value(n) => {
-                if n >= 10 {
-                    SplitResult::new(
-                        Element::new_pair(Element::Value(n / 2), Element::Value(n / 2 + n % 2)),
-                        true,
-                    )
+                if *n >= 10 {
+                    *self =
+                        Element::new_pair(Element::Value(*n / 2), Element::Value(*n / 2 + *n % 2));
+                    true
                 } else {
-                    SplitResult::new(self, false)
+                    false
                 }
             }
 
             Element::Pair(l, r) => {
                 let l_res = l.split();
-                if l_res.has_split {
-                    SplitResult::new(Element::new_pair(l_res.el, *r), true)
+                if l_res {
+                    true
                 } else {
-                    let r_res = r.split();
-                    SplitResult::new(Element::new_pair(l_res.el, r_res.el), r_res.has_split)
+                    r.split()
                 }
             }
         }
@@ -106,14 +96,10 @@ impl Element {
 
     fn reduce(mut self) -> Element {
         loop {
-            let explode_res = self.explode(0);
-            self = explode_res.el;
-            if explode_res.exploded {
+            if self.explode(0).exploded {
                 continue;
             }
-            let split_res = self.split();
-            self = split_res.el;
-            if split_res.has_split {
+            if self.split() {
                 continue;
             }
             break;
@@ -130,31 +116,18 @@ impl Element {
 }
 
 struct ExplodeResult {
-    el: Element,
     l_add: Option<usize>,
     r_add: Option<usize>,
     exploded: bool,
 }
 
 impl ExplodeResult {
-    fn new(el: Element, l_add: Option<usize>, r_add: Option<usize>, exploded: bool) -> Self {
+    fn new(l_add: Option<usize>, r_add: Option<usize>, exploded: bool) -> Self {
         ExplodeResult {
-            el,
             l_add,
             r_add,
             exploded,
         }
-    }
-}
-
-struct SplitResult {
-    el: Element,
-    has_split: bool,
-}
-
-impl SplitResult {
-    fn new(el: Element, has_split: bool) -> Self {
-        SplitResult { el, has_split }
     }
 }
 
