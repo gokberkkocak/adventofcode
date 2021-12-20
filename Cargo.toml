@@ -17,3 +17,7 @@ ahash = "0.7"
 fxhash = "0.2"
 bitvec = "0.22"
 itertools = "0.10"
+
+[profile.release]
+codegen-units=1
+lto="fat"
