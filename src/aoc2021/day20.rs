@@ -55,8 +55,8 @@ impl Image {
         let y_len = self.image.len();
         let x_len = self.image[0].len();
         let mut new_image = vec![vec![false; self.image[0].len() + 2]; self.image.len() + 2];
-        for (y,row) in new_image.iter_mut().enumerate().take(y_len + 2) {
-            for (x, value) in row.iter_mut().enumerate().take(x_len + 2) {
+        for (y,row) in new_image.iter_mut().enumerate() {
+            for (x, value) in row.iter_mut().enumerate() {
                 let index = ZONE
                     .iter()
                     .rev()
