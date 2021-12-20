@@ -22,12 +22,8 @@ pub(crate) fn run() {
 }
 
 fn part_core(im: &mut Image, n: usize) -> usize {
-    // println!("{}", im);
-    // println!("----------------------------------------");
     for i in 0..n {
         im.enhance(i % 2 == 1);
-        // println!("{}", im);
-        // println!("----------------------------------------");
     }
     im.count()
 }
@@ -76,38 +72,22 @@ impl Image {
                     .iter()
                     .rev()
                     .enumerate()
-                    .map(
-                        |(i, (dx, dy))| 
-                        match (self.image.contains(&(x + dx, y + dy)), self.flip, odd,  x + dx >= min_x
-                        && x + dx <= max_x
-                        && y + dy >= min_y
-                        && y + dy <= max_y) {
+                    .map(|(i, (dx, dy))| {
+                        match (
+                            self.image.contains(&(x + dx, y + dy)),
+                            self.flip,
+                            odd,
+                            x + dx >= min_x
+                                && x + dx <= max_x
+                                && y + dy >= min_y
+                                && y + dy <= max_y,
+                        ) {
                             (true, _, _, _) => 1 << i,
                             (false, true, true, true) => 0,
                             (false, true, true, false) => 1 << i,
                             _ => 0,
                         }
-                        
-                        
-                        // match self.image.contains(&(x + dx, y + dy)) {
-                        //     true => 1 << i,
-                        //     false => {
-                        //         if odd && self.algo[0] {
-                        //             if x + dx >= min_x
-                        //                 && x + dx <= max_x
-                        //                 && y + dy >= min_y
-                        //                 && y + dy <= max_y
-                        //             {
-                        //                 0
-                        //             } else {
-                        //                 1 << i
-                        //             }
-                        //         } else {
-                        //             0
-                        //         }
-                        //     }
-                        // },
-                    )
+                    })
                     .sum::<usize>();
                 if self.algo[index] {
                     new_image.insert((x, y));
