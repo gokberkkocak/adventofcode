@@ -65,7 +65,6 @@ impl Image {
         let max_x = self.image.iter().map(|&(x, _)| x).max().unwrap();
         let min_y = self.image.iter().map(|&(_, y)| y).min().unwrap();
         let max_y = self.image.iter().map(|&(_, y)| y).max().unwrap();
-
         for y in min_y - 2..max_y + 2 {
             for x in min_x - 2..max_x + 2 {
                 let index = ZONE
@@ -98,29 +97,7 @@ impl Image {
     }
 
     fn count(&self) -> usize {
-        self.image.iter().count()
-    }
-}
-
-impl std::fmt::Display for Image {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut lines = vec![];
-        let min_x = self.image.iter().map(|&(x, _)| x).min().unwrap();
-        let max_x = self.image.iter().map(|&(x, _)| x).max().unwrap();
-        let min_y = self.image.iter().map(|&(_, y)| y).min().unwrap();
-        let max_y = self.image.iter().map(|&(_, y)| y).max().unwrap();
-        for y in min_y..max_y {
-            let mut line = String::new();
-            for x in min_x..max_x {
-                line.push(if self.image.contains(&(x, y)) {
-                    '#'
-                } else {
-                    '.'
-                });
-            }
-            lines.push(line);
-        }
-        write!(f, "{}", lines.join("\n"))
+        self.image.len()
     }
 }
 
