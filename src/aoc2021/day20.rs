@@ -1,5 +1,3 @@
-use fxhash::FxHashSet;
-
 const ZONE: [(isize, isize); 9] = [
     (-1, -1),
     (0, -1),
@@ -17,7 +15,7 @@ pub(crate) fn run() {
     let mut im = parse(&input);
     let p1 = part_core(&mut im, 2);
     println!("Part 1: {}", p1);
-    let p2 = part_core(&mut im, 48);
+    let p2 = part_core(&mut im, 50 - 2);
     println!("Part 1: {}", p2);
 }
 
@@ -29,7 +27,7 @@ fn part_core(im: &mut Image, n: usize) -> usize {
 }
 
 struct Image {
-    image: FxHashSet<(isize, isize)>,
+    image: Vec<Vec<bool>>,
     flip: bool,
     algo: Vec<bool>,
 }
@@ -46,58 +44,53 @@ fn parse(input: &str) -> Image {
         .next()
         .unwrap()
         .lines()
-        .enumerate()
-        .flat_map(|(y, line)| {
-            line.chars()
-                .enumerate()
-                .filter(|(_x, c)| *c == '#')
-                .map(move |(x, _c)| (x as isize, y as isize))
-        })
-        .collect::<FxHashSet<_>>();
+        .map(|line| line.chars().map(|c| c == '#').collect())
+        .collect::<Vec<Vec<_>>>();
     let flip = algo[0];
     Image { image, flip, algo }
 }
 
 impl Image {
     fn enhance(&mut self, odd: bool) {
-        let mut new_image = FxHashSet::default();
-        let min_x = self.image.iter().map(|&(x, _)| x).min().unwrap();
-        let max_x = self.image.iter().map(|&(x, _)| x).max().unwrap();
-        let min_y = self.image.iter().map(|&(_, y)| y).min().unwrap();
-        let max_y = self.image.iter().map(|&(_, y)| y).max().unwrap();
-        for y in min_y - 2..max_y + 2 {
-            for x in min_x - 2..max_x + 2 {
+        let y_len = self.image.len();
+        let x_len = self.image[0].len();
+        let mut new_image = vec![vec![false; self.image[0].len() + 2]; self.image.len() + 2];
+        for (y,row) in new_image.iter_mut().enumerate().take(y_len + 2) {
+            for (x, value) in row.iter_mut().enumerate().take(x_len + 2) {
                 let index = ZONE
                     .iter()
                     .rev()
                     .enumerate()
                     .map(|(i, (dx, dy))| {
-                        match (
-                            self.image.contains(&(x + dx, y + dy)),
-                            self.flip,
-                            odd,
-                            x + dx >= min_x
-                                && x + dx <= max_x
-                                && y + dy >= min_y
-                                && y + dy <= max_y,
-                        ) {
-                            (true, _, _, _) => 1 << i,
-                            (false, true, true, true) => 0,
-                            (false, true, true, false) => 1 << i,
-                            _ => 0,
+                        let new_x = x as isize + dx - 1;
+                        let new_y = y as isize + dy - 1;
+                        if new_x < 0
+                            || new_y < 0
+                            || new_x >= x_len as isize
+                            || new_y >= y_len as isize
+                        {
+                            if odd && self.flip {
+                                1 << i
+                            } else {
+                                0
+                            }
+                        } else {
+                            (self.image[new_y as usize][new_x as usize] as usize) << i
                         }
                     })
                     .sum::<usize>();
-                if self.algo[index] {
-                    new_image.insert((x, y));
-                }
+                *value = self.algo[index];
             }
         }
         self.image = new_image;
     }
 
     fn count(&self) -> usize {
-        self.image.len()
+        self.image
+            .iter()
+            .flat_map(|row| row.iter())
+            .filter(|&&c| c)
+            .count()
     }
 }
 
