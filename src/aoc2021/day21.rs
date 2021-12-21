@@ -81,7 +81,7 @@ impl DiracDieGame {
     #[inline]
     fn quantum_play(&self) -> usize {
         // pre-compute 27 combinations and count the number of occurrences for each outcome as well.
-        let scores_occ = (1..=3)
+        let outcomes_occ = (1..=3)
             .cartesian_product(1..=3)
             .cartesian_product(1..=3)
             .map(|((d1, d2), d3)| d1 + d2 + d3)
@@ -94,7 +94,7 @@ impl DiracDieGame {
         let mut cache = FxHashMap::default();
         let (p1_win, p2_win) = Self::quantum_inner_play(
             &mut cache,
-            &scores_occ,
+            &outcomes_occ,
             self.p1_starting,
             0,
             self.p2_starting,
@@ -105,7 +105,7 @@ impl DiracDieGame {
 
     fn quantum_inner_play(
         cache: &mut FxHashMap<(usize, usize, usize, usize), (usize, usize)>,
-        scores_occ: &[(usize, usize)],
+        outcomes_occ: &[(usize, usize)],
         cur_pos: usize,
         cur_score: usize,
         other_pos: usize,
@@ -121,12 +121,12 @@ impl DiracDieGame {
         }
         let mut cur_win_count = 0;
         let mut oth_win_count = 0;
-        for (score, occ) in scores_occ {
-            let cur_pos = (cur_pos + score - 1) % 10 + 1;
+        for (outcome, occ) in outcomes_occ {
+            let cur_pos = (cur_pos + outcome - 1) % 10 + 1;
             let cur_score = cur_score + cur_pos;
             let (oth_win_add, cur_win_add) = Self::quantum_inner_play(
                 cache,
-                scores_occ,
+                outcomes_occ,
                 other_pos,
                 other_score,
                 cur_pos,
