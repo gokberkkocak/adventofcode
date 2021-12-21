@@ -5,9 +5,9 @@ pub(crate) fn run() {
     let (drawn, mut boards) = parse(&input);
     let mut cloned_boards = boards.clone();
     let p1 = part1(&drawn, &mut boards);
-    println!("P1: {}", p1);
+    println!("Part 1: {}", p1);
     let p2 = part2(&drawn, &mut cloned_boards);
-    println!("P2: {}", p2);
+    println!("Part 2: {}", p2);
 }
 
 fn parse(input: &str) -> (Vec<usize>, Vec<Board>) {

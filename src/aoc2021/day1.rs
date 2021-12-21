@@ -2,9 +2,9 @@ pub(crate) fn run() {
     let input = crate::util::get_puzzle_input(2021, 1);
     let v = parse(&input);
     let p1 = part1(&v);
-    println!("p1: {} ", p1);
+    println!("Part 1: {} ", p1);
     let p2 = part2(&v);
-    println!("p2: {} ", p2);
+    println!("Part 2: {} ", p2);
 }
 
 fn parse(input: &str) -> Vec<u32> {
