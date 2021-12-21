@@ -50,18 +50,17 @@ impl DiracDieGame {
     #[inline]
     fn practice_play(&self) -> usize {
         let mut it = (1..=100).cycle();
-        let ref_it = &mut it;
         let mut p1 = self.p1_starting;
         let mut p2 = self.p2_starting;
         let mut p1_score = 0;
         let mut p2_score = 0;
         let mut dice_count = 0;
         loop {
-            Self::practice_inner_play(&mut p1, ref_it, &mut p1_score, &mut dice_count);
+            Self::practice_inner_play(&mut p1, &mut it, &mut p1_score, &mut dice_count);
             if p1_score >= PRACTICE_WIN_SCORE {
                 return p2_score * dice_count;
             }
-            Self::practice_inner_play(&mut p2, ref_it, &mut p2_score, &mut dice_count);
+            Self::practice_inner_play(&mut p2, &mut it, &mut p2_score, &mut dice_count);
             if p2_score >= PRACTICE_WIN_SCORE {
                 return p1_score * dice_count;
             }
@@ -81,7 +80,7 @@ impl DiracDieGame {
 
     #[inline]
     fn quantum_play(&self) -> usize {
-        // pre-compute 27 combinations and count the number of occurences for each outcome as well.
+        // pre-compute 27 combinations and count the number of occurrences for each outcome as well.
         let scores_occ = (1..=3)
             .cartesian_product(1..=3)
             .cartesian_product(1..=3)
@@ -125,7 +124,7 @@ impl DiracDieGame {
         for (score, occ) in scores_occ {
             let cur_pos = (cur_pos + score - 1) % 10 + 1;
             let cur_score = cur_score + cur_pos;
-            let (oth_win_add, cur_win_add) = DiracDieGame::quantum_inner_play(
+            let (oth_win_add, cur_win_add) = Self::quantum_inner_play(
                 cache,
                 scores_occ,
                 other_pos,
