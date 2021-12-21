@@ -16,7 +16,7 @@ pub(crate) fn run() {
     let p1 = part_core(&mut im, 2);
     println!("Part 1: {}", p1);
     let p2 = part_core(&mut im, 50 - 2);
-    println!("Part 1: {}", p2);
+    println!("Part 2: {}", p2);
 }
 
 fn part_core(im: &mut Image, n: usize) -> usize {
