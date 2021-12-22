@@ -1,5 +1,5 @@
-const PRACTICE_WIN_SCORE: usize = 1000;
-const QUANTUM_WIN_SCORE: usize = 21;
+const PRACTICE_WIN_SCORE: u16 = 1000;
+const QUANTUM_WIN_SCORE: u8 = 21;
 
 use fxhash::FxHashMap;
 use itertools::Itertools;
@@ -35,12 +35,12 @@ fn parse(input: &str) -> DiracDieGame {
 }
 
 struct DiracDieGame {
-    p1_starting: usize,
-    p2_starting: usize,
+    p1_starting: u8,
+    p2_starting: u8,
 }
 
 impl DiracDieGame {
-    fn new(p1_starting: usize, p2_starting: usize) -> Self {
+    fn new(p1_starting: u8, p2_starting: u8) -> Self {
         DiracDieGame {
             p1_starting,
             p2_starting,
@@ -49,7 +49,7 @@ impl DiracDieGame {
 
     #[inline]
     fn practice_play(&self) -> usize {
-        let mut it = (1..=100).cycle();
+        let mut it = (1..=100u16).cycle();
         let mut p1 = self.p1_starting;
         let mut p2 = self.p2_starting;
         let mut p1_score = 0;
@@ -58,34 +58,34 @@ impl DiracDieGame {
         loop {
             Self::practice_inner_play(&mut p1, &mut it, &mut p1_score, &mut dice_count);
             if p1_score >= PRACTICE_WIN_SCORE {
-                return p2_score * dice_count;
+                return p2_score as usize * dice_count;
             }
             Self::practice_inner_play(&mut p2, &mut it, &mut p2_score, &mut dice_count);
             if p2_score >= PRACTICE_WIN_SCORE {
-                return p1_score * dice_count;
+                return p1_score as usize * dice_count;
             }
         }
     }
     #[inline]
     fn practice_inner_play(
-        p: &mut usize,
-        it: &mut impl Iterator<Item = usize>,
-        score: &mut usize,
+        p: &mut u8,
+        it: &mut impl Iterator<Item = u16>,
+        score: &mut u16,
         dice_count: &mut usize,
     ) {
-        *p = (it.take(3).sum::<usize>() + *p - 1) % 10 + 1;
-        *score += *p;
+        *p = ((it.take(3).sum::<u16>() + (*p as u16) - 1) % 10 + 1) as u8;
+        *score += *p as u16;
         *dice_count += 3;
     }
 
     #[inline]
     fn quantum_play(&self) -> usize {
         // pre-compute 27 combinations and count the number of occurrences for each outcome as well.
-        let outcomes_occ = (1..=3)
-            .cartesian_product(1..=3)
-            .cartesian_product(1..=3)
+        let outcomes_occ = (1..=3u8)
+            .cartesian_product(1..=3u8)
+            .cartesian_product(1..=3u8)
             .map(|((d1, d2), d3)| d1 + d2 + d3)
-            .fold(FxHashMap::<usize, usize>::default(), |mut m, x| {
+            .fold(FxHashMap::default(), |mut m, x| {
                 *m.entry(x).or_default() += 1;
                 m
             })
@@ -104,12 +104,12 @@ impl DiracDieGame {
     }
 
     fn quantum_inner_play(
-        cache: &mut FxHashMap<(usize, usize, usize, usize), (usize, usize)>,
-        outcomes_occ: &[(usize, usize)],
-        cur_pos: usize,
-        cur_score: usize,
-        other_pos: usize,
-        other_score: usize,
+        cache: &mut FxHashMap<(u8, u8, u8, u8), (usize, usize)>,
+        outcomes_occ: &[(u8, usize)],
+        cur_pos: u8,
+        cur_score: u8,
+        other_pos: u8,
+        other_score: u8,
     ) -> (usize, usize) {
         // check other win condition first
         if other_score >= QUANTUM_WIN_SCORE {
