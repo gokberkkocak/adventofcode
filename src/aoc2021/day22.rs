@@ -19,7 +19,7 @@ struct Cuboid {
 
 impl From<&str> for Cuboid {
     fn from(s: &str) -> Self {
-        let vec = s
+        let c = s
             .split(',')
             .flat_map(|p| {
                 p.split('=')
@@ -29,7 +29,7 @@ impl From<&str> for Cuboid {
                     .map(|v| v.parse::<i32>().unwrap())
             })
             .collect::<Vec<_>>();
-        Cuboid::new(vec[0], vec[1], vec[2], vec[3], vec[4], vec[5])
+        Cuboid::new(c[0], c[1], c[2], c[3], c[4], c[5])
     }
 }
 
@@ -136,18 +136,18 @@ impl Cuboid {
 }
 
 fn parse(input: &str) -> Vec<Cuboid> {
-    input.lines().fold(Vec::<Cuboid>::new(), |mut state, line| {
+    input.lines().fold(Vec::<Cuboid>::new(), |mut acc, line| {
         let (switch_str, coords) = line.split_once(' ').unwrap();
         let switch = switch_str == "on";
-        let mut new_cuboids = Vec::with_capacity(state.len() + 24);
+        let mut cuboids = Vec::with_capacity(acc.len() + 24);
         let parsed_cuboid = Cuboid::from(coords);
-        for oc in state.iter_mut() {
-            new_cuboids.append(&mut oc.intersect_split(&parsed_cuboid));
+        for oc in acc.iter_mut() {
+            cuboids.append(&mut oc.intersect_split(&parsed_cuboid));
         }
         if switch {
-            new_cuboids.push(parsed_cuboid);
+            cuboids.push(parsed_cuboid);
         }
-        new_cuboids
+        cuboids
     })
 }
 
