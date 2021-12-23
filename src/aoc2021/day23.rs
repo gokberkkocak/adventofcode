@@ -3,7 +3,7 @@ use std::collections::BinaryHeap;
 
 use fxhash::FxHashMap;
 
-static VALID_COORDS: &'static [(i32, i32)] = &[
+static VALID_COORDS: &[(i32, i32)] = &[
     (0, 0),
     (1, 0),
     (3, 0),
@@ -41,7 +41,7 @@ fn dist(from: u8, to: u8) -> u32 {
 }
 
 fn try_move_down(p: &[u8; 23], it: u8) -> Option<u8> {
-    assert_eq!(true, it >= 1 && it <= 4);
+    assert!((1..=4).contains(&it));
     let ppos = usize::from(it * 4 + 3);
     let pocket = &p[ppos..ppos + 4];
     for q in (0..=3).rev() {
@@ -52,7 +52,7 @@ fn try_move_down(p: &[u8; 23], it: u8) -> Option<u8> {
             return None;
         }
     }
-    return None;
+    None
 }
 
 fn try_move_up(p: &[u8; 23], it: u8) -> Option<u8> {
@@ -60,13 +60,13 @@ fn try_move_up(p: &[u8; 23], it: u8) -> Option<u8> {
     let pocket = &p[ppos..ppos + 4];
     for q in 0..=3 {
         if pocket[q] != 0 {
-            if pocket[q..].into_iter().all(|x| *x == it) {
+            if pocket[q..].iter().all(|x| *x == it) {
                 return None;
             }
             return Some((ppos + q) as u8);
         }
     }
-    return None;
+    None
 }
 
 fn possible_moves(p: &[u8; 23]) -> Vec<(u8, u8)> {
@@ -96,7 +96,7 @@ fn possible_moves(p: &[u8; 23]) -> Vec<(u8, u8)> {
             if let Some(down) = try_move_down(p, p[up as usize]) {
                 let right_target = p[up as usize];
                 let left_target = p[up as usize] + 1;
-                if f + 1 <= right_target {
+                if f < right_target {
                     for i in f + 1..=right_target {
                         if p[i as usize] != 0 {
                             continue 'up;
@@ -124,10 +124,8 @@ fn possible_moves(p: &[u8; 23]) -> Vec<(u8, u8)> {
                 if p[from + 1..=right_target].iter().any(|x| *x != 0) {
                     continue 'down;
                 }
-            } else {
-                if p[left_target..from].iter().any(|x| *x != 0) {
-                    continue 'down;
-                }
+            } else if p[left_target..from].iter().any(|x| *x != 0) {
+                continue 'down;
             }
             results.push((from as u8, down))
         }
@@ -144,7 +142,7 @@ fn do_move(p: &[u8; 23], m: (u8, u8)) -> ([u8; 23], u32) {
         4 => 1000,
         _ => unreachable!(),
     };
-    let mut new_p = p.clone();
+    let mut new_p = *p;
     new_p[m.1 as usize] = p[m.0 as usize];
     new_p[m.0 as usize] = 0;
     (new_p, d * step)
@@ -183,10 +181,10 @@ fn shortest_path_cost(p0: &[u8; 23], p1: &[u8; 23]) -> Option<u32> {
             return Some(cost);
         }
         // if we've already seen this position skip
-        if !seen.get(&pos).is_none() {
+        if seen.get(&pos).is_some() {
             continue;
         }
-        seen.insert(pos.clone(), mv);
+        seen.insert(pos, mv);
         let moves = possible_moves(&pos);
         for m in moves {
             let (next, step_cost) = do_move(&pos, m);
@@ -213,7 +211,7 @@ fn parse(input: &str) -> [u8; 23] {
     // first 7 halls, after each 4 rooms. rooms are empty at start
     let mut start_pos = [
         0u8, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 3, 2, 0, 0, 2, 1, 0, 0, 1, 3, 0,
-    ]; 
+    ];
     // fills rooms
     for (i, line) in pre_rooms.iter().enumerate() {
         for (j, c) in line.iter().enumerate() {
