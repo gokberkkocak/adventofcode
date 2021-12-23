@@ -202,7 +202,7 @@ fn parse(input: &str) -> [u8; 23] {
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    // first 7 are top row, after each 4 for rooms. rooms are empty at start
+    // first 7 are top row, after each 4 for rooms. rooms input is empty at start.
     let mut start_pos = [
         0u8, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 3, 2, 0, 0, 2, 1, 0, 0, 1, 3, 0,
     ];
