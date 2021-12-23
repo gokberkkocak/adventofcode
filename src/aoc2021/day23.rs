@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-use fxhash::FxHashMap;
+use fxhash::FxHashSet;
 
 static VALID_COORDS: &[(i32, i32)] = &[
     (0, 0),
@@ -152,7 +152,6 @@ fn do_move(p: &[u8; 23], m: (u8, u8)) -> ([u8; 23], u32) {
 struct PosWithCost {
     pos: [u8; 23],
     cost: u32,
-    mv: (u8, u8),
 }
 
 impl Ord for PosWithCost {
@@ -169,13 +168,9 @@ impl PartialOrd for PosWithCost {
 
 fn shortest_path_cost(p0: &[u8; 23], p1: &[u8; 23]) -> Option<u32> {
     let mut queue = BinaryHeap::new();
-    let mut seen = FxHashMap::<[u8; 23], (u8, u8)>::default();
-    queue.push(PosWithCost {
-        pos: *p0,
-        cost: 0,
-        mv: (0, 0),
-    });
-    while let Some(PosWithCost { pos, cost, mv }) = queue.pop() {
+    let mut seen = FxHashSet::<[u8; 23]>::default();
+    queue.push(PosWithCost { pos: *p0, cost: 0 });
+    while let Some(PosWithCost { pos, cost }) = queue.pop() {
         if pos == *p1 {
             // found
             return Some(cost);
@@ -184,14 +179,13 @@ fn shortest_path_cost(p0: &[u8; 23], p1: &[u8; 23]) -> Option<u32> {
         if seen.get(&pos).is_some() {
             continue;
         }
-        seen.insert(pos, mv);
+        seen.insert(pos);
         let moves = possible_moves(&pos);
         for m in moves {
             let (next, step_cost) = do_move(&pos, m);
             queue.push(PosWithCost {
                 pos: next,
                 cost: cost + step_cost,
-                mv: m,
             })
         }
     }
@@ -208,7 +202,7 @@ fn parse(input: &str) -> [u8; 23] {
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    // first 7 halls, after each 4 rooms. rooms are empty at start
+    // first 7 are top row, after each 4 for rooms. rooms are empty at start
     let mut start_pos = [
         0u8, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 3, 2, 0, 0, 2, 1, 0, 0, 1, 3, 0,
     ];
