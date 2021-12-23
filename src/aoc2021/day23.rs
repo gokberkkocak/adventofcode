@@ -1,113 +1,206 @@
+use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
 use fxhash::FxHashMap;
 
-const WEIGHT: [i64; 4] = [1, 10, 100, 1000];
-const BUF_WEIGHT: [i64; 7] = [0, 1, 3, 5, 7, 9, 10];
+static VALID_COORDS: &'static [(i32, i32)] = &[
+    (0, 0),
+    (1, 0),
+    (3, 0),
+    (5, 0),
+    (7, 0),
+    (9, 0),
+    (10, 0),
+    (2, 1),
+    (2, 2),
+    (2, 3),
+    (2, 4),
+    (4, 1),
+    (4, 2),
+    (4, 3),
+    (4, 4),
+    (6, 1),
+    (6, 2),
+    (6, 3),
+    (6, 4),
+    (8, 1),
+    (8, 2),
+    (8, 3),
+    (8, 4),
+];
 
-fn weight(c: char) -> i64 {
-    WEIGHT[(c as u8 - b'A') as usize]
+fn dist(from: u8, to: u8) -> u32 {
+    let f = &VALID_COORDS[from as usize];
+    let t = &VALID_COORDS[to as usize];
+    (f.0 - t.0).abs() as u32
+        + if f.0 == t.0 {
+            (f.1 - t.1).abs() as u32
+        } else {
+            (f.1 + t.1) as u32
+        }
 }
 
-fn buf_traversal_cost(i: usize, j: usize, c: char) -> i64 {
-    (BUF_WEIGHT[i] - BUF_WEIGHT[j]).abs() * WEIGHT[(c as u8 - b'A') as usize]
+fn try_move_down(p: &[u8; 23], it: u8) -> Option<u8> {
+    assert_eq!(true, it >= 1 && it <= 4);
+    let ppos = usize::from(it * 4 + 3);
+    let pocket = &p[ppos..ppos + 4];
+    for q in (0..=3).rev() {
+        if pocket[q] == 0 {
+            return Some((ppos + q) as u8);
+        }
+        if pocket[q] != it {
+            return None;
+        }
+    }
+    return None;
 }
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct State {
-    rooms: Vec<Vec<char>>,
-    buffer: [char; 7],
-    room_size: usize,
-}
-
-impl State {
-    fn is_valid_room(&self, i: usize) -> bool {
-        self.rooms[i]
-            .iter()
-            .all(|&c| i == (c as u8 - b'A') as usize)
-    }
-
-    fn entry_cost(&self, i: usize) -> i64 {
-        (self.room_size - self.rooms[i].len()) as i64 * WEIGHT[i]
-    }
-
-    fn exit_cost(&self, i: usize, c: char) -> i64 {
-        (self.room_size - self.rooms[i].len()) as i64 * weight(c)
-    }
-
-    fn transition_room_to_buffer(&self) -> Vec<(State, i64)> {
-        let mut res = vec![];
-        for i in 0..4 {
-            if self.is_valid_room(i) {
-                continue;
+fn try_move_up(p: &[u8; 23], it: u8) -> Option<u8> {
+    let ppos = usize::from(it * 4 + 3);
+    let pocket = &p[ppos..ppos + 4];
+    for q in 0..=3 {
+        if pocket[q] != 0 {
+            if pocket[q..].into_iter().all(|x| *x == it) {
+                return None;
             }
-            let mut next = self.clone();
-            let c = next.rooms[i].pop().unwrap();
-            for j in (0..=i + 1).rev() {
-                let cost = buf_traversal_cost(j, i + 1, c) + weight(c) + next.exit_cost(i, c);
-                if next.buffer[j] == '.' {
-                    next.buffer[j] = c;
-                    res.push((next.clone(), cost));
-                    next.buffer[j] = '.';
+            return Some((ppos + q) as u8);
+        }
+    }
+    return None;
+}
+
+fn possible_moves(p: &[u8; 23]) -> Vec<(u8, u8)> {
+    let mut results = Vec::<(u8, u8)>::new();
+    'up: for f in 1..=4 {
+        if let Some(up) = try_move_up(p, f) {
+            // left
+            for left_pos in (0..=f).rev() {
+                if p[left_pos as usize] == 0 {
+                    results.push((up, left_pos));
                 } else {
                     break;
                 }
             }
-            for j in i + 2..7 {
-                let cost = buf_traversal_cost(i + 2, j, c) + weight(c) + next.exit_cost(i, c);
-                if next.buffer[j] == '.' {
-                    next.buffer[j] = c;
-                    res.push((next.clone(), cost));
-                    next.buffer[j] = '.';
+            // right
+            for right_pos in f + 1..=6 {
+                if p[right_pos as usize] == 0 {
+                    results.push((up, right_pos));
                 } else {
                     break;
                 }
             }
-        }
-        res
-    }
-
-    fn transition_buffer_to_room(&self) -> Vec<(State, i64)> {
-        let mut res = vec![];
-        for i in 0..7 {
-            if self.buffer[i] == '.' {
+            // direct down, verify intermediate positions
+            if p[up as usize] == f {
                 continue;
             }
-            let r = (self.buffer[i] as u8 - b'A') as usize;
-            if !self.is_valid_room(r) {
-                continue;
-            }
-            if i <= r + 1 {
-                if (i + 1..=r + 1).all(|i| self.buffer[i] == '.') {
-                    let mut next = self.clone();
-                    let c = buf_traversal_cost(i, r + 1, next.buffer[i])
-                        + weight(next.buffer[i])
-                        + self.entry_cost(r);
-                    next.rooms[r].push(next.buffer[i]);
-                    next.buffer[i] = '.';
-                    res.push((next, c));
+            if let Some(down) = try_move_down(p, p[up as usize]) {
+                let right_target = p[up as usize];
+                let left_target = p[up as usize] + 1;
+                if f + 1 <= right_target {
+                    for i in f + 1..=right_target {
+                        if p[i as usize] != 0 {
+                            continue 'up;
+                        }
+                    }
+                } else {
+                    for i in left_target..=f {
+                        if p[i as usize] != 0 {
+                            continue 'up;
+                        }
+                    }
                 }
-            } else if (r + 2..i).all(|i| self.buffer[i] == '.') {
-                let mut next = self.clone();
-                let c = buf_traversal_cost(r + 2, i, next.buffer[i])
-                    + weight(next.buffer[i])
-                    + self.entry_cost(r);
-                next.rooms[r].push(next.buffer[i]);
-                next.buffer[i] = '.';
-                res.push((next, c));
+                results.push((up as u8, down))
             }
         }
-        res
     }
+    'down: for from in 0..=6 {
+        if p[from] == 0 {
+            continue;
+        }
+        if let Some(down) = try_move_down(p, p[from]) {
+            let right_target = p[from] as usize;
+            let left_target = p[from] as usize + 1;
+            if from <= right_target {
+                if p[from + 1..=right_target].iter().any(|x| *x != 0) {
+                    continue 'down;
+                }
+            } else {
+                if p[left_target..from].iter().any(|x| *x != 0) {
+                    continue 'down;
+                }
+            }
+            results.push((from as u8, down))
+        }
+    }
+    results
+}
 
-    fn transitions(&self) -> Vec<(State, i64)> {
-        let mut res = self.transition_room_to_buffer();
-        res.append(&mut self.transition_buffer_to_room());
-        res
+fn do_move(p: &[u8; 23], m: (u8, u8)) -> ([u8; 23], u32) {
+    let d = dist(m.0, m.1);
+    let step: u32 = match p[m.0 as usize] {
+        1 => 1,
+        2 => 10,
+        3 => 100,
+        4 => 1000,
+        _ => unreachable!(),
+    };
+    let mut new_p = p.clone();
+    new_p[m.1 as usize] = p[m.0 as usize];
+    new_p[m.0 as usize] = 0;
+    (new_p, d * step)
+}
+
+#[derive(Eq, PartialEq)]
+struct PosWithCost {
+    pos: [u8; 23],
+    cost: u32,
+    mv: (u8, u8),
+}
+
+impl Ord for PosWithCost {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost)
     }
 }
 
-fn parse(input: &str, part2: bool) -> State {
+impl PartialOrd for PosWithCost {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn shortest_path_cost(p0: &[u8; 23], p1: &[u8; 23]) -> Option<u32> {
+    let mut queue = BinaryHeap::new();
+    let mut seen = FxHashMap::<[u8; 23], (u8, u8)>::default();
+    queue.push(PosWithCost {
+        pos: *p0,
+        cost: 0,
+        mv: (0, 0),
+    });
+    while let Some(PosWithCost { pos, cost, mv }) = queue.pop() {
+        if pos == *p1 {
+            // found
+            return Some(cost);
+        }
+        // if we've already seen this position skip
+        if !seen.get(&pos).is_none() {
+            continue;
+        }
+        seen.insert(pos.clone(), mv);
+        let moves = possible_moves(&pos);
+        for m in moves {
+            let (next, step_cost) = do_move(&pos, m);
+            queue.push(PosWithCost {
+                pos: next,
+                cost: cost + step_cost,
+                mv: m,
+            })
+        }
+    }
+    None
+}
+
+fn parse(input: &str) -> [u8; 23] {
     let pre_rooms = input
         .lines()
         .skip(2)
@@ -117,96 +210,27 @@ fn parse(input: &str, part2: bool) -> State {
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    let mut rooms = vec![vec!['.'; 4]; 4];
-    for (y, row) in pre_rooms.iter().enumerate().take(pre_rooms.len() - 1) {
-        for (x, r) in rooms.iter_mut().enumerate().take(pre_rooms[y].len()) {
-            r[pre_rooms[y].len() - 1 - y] = row[x];
+    // first 7 halls, after each 4 rooms. rooms are empty at start
+    let mut start_pos = [
+        0u8, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 3, 2, 0, 0, 2, 1, 0, 0, 1, 3, 0,
+    ]; 
+    // fills rooms
+    for (i, line) in pre_rooms.iter().enumerate() {
+        for (j, c) in line.iter().enumerate() {
+            start_pos[(j % 4) * 4 + i * 3 + 7] = *c as u8 - b'A' + 1;
         }
     }
-    for r in rooms.iter_mut() {
-        r.remove(0);
-        r.remove(0);
-    }
-    if part2 {
-        rooms[0].insert(1, 'D');
-        rooms[0].insert(2, 'D');
-        rooms[1].insert(1, 'B');
-        rooms[1].insert(2, 'C');
-        rooms[2].insert(1, 'A');
-        rooms[2].insert(2, 'B');
-        rooms[3].insert(1, 'C');
-        rooms[3].insert(2, 'A');
-    }
-    let room_size = if part2 { 4 } else { 2 };
-    State {
-        rooms,
-        buffer: ['.'; 7],
-        room_size,
-    }
-}
-
-pub fn part1(input: &str) -> i64 {
-    let start = parse(input, false);
-    let expected = State {
-        rooms: vec![
-            vec!['A', 'A'],
-            vec!['B', 'B'],
-            vec!['C', 'C'],
-            vec!['D', 'D'],
-        ],
-        buffer: ['.'; 7],
-        room_size: 2,
-    };
-    d(start, expected)
-}
-
-fn part2(input: &str) -> i64 {
-    let start = parse(input, true);
-    let expected = State {
-        rooms: vec![
-            vec!['A', 'A', 'A', 'A'],
-            vec!['B', 'B', 'B', 'B'],
-            vec!['C', 'C', 'C', 'C'],
-            vec!['D', 'D', 'D', 'D'],
-        ],
-        buffer: ['.'; 7],
-        room_size: 4,
-    };
-    d(start, expected)
-}
-
-fn d(s: State, f: State) -> i64 {
-    let mut costs = FxHashMap::default();
-    let mut q = BinaryHeap::new();
-    costs.insert(s.clone(), 0);
-    q.push((0, s));
-    while let Some((cost, grid)) = q.pop() {
-        let cost = -cost;
-        if cost != costs[&grid] {
-            continue;
-        }
-        if grid == f {
-            break;
-        }
-        for (transition, t_cost) in grid.transitions() {
-            if let Some(&c) = costs.get(&transition) {
-                if c <= t_cost + cost {
-                    continue;
-                }
-            }
-            costs.insert(transition.clone(), t_cost + cost);
-            q.push((-(t_cost + cost), transition));
-        }
-    }
-    *costs.get(&f).unwrap()
+    start_pos
 }
 
 pub fn run() {
     let input = crate::util::get_puzzle_input(2021, 23);
-    let p1 = part1(&input);
-    println!("Part 1: {}", p1);
-    let p2 = part2(&input);
-    println!("Part 1: {}", p2);
+    let start_pos = parse(&input);
+    let final_pos = [
+        0u8, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
+    ];
+    let p2 = shortest_path_cost(&start_pos, &final_pos).unwrap();
+    println!("Part 2: {}", p2);
 }
 
 #[cfg(test)]
@@ -216,14 +240,11 @@ mod tests {
     #[test]
     fn test_1() {
         let input = crate::util::read_file("inputs/2021_23_test.in");
-        let p1 = part1(&input);
-        assert_eq!(p1, 12521);
-    }
-
-    #[test]
-    fn test_2() {
-        let input = crate::util::read_file("inputs/2021_23_test.in");
-        let p2 = part2(&input);
+        let start_pos = parse(&input);
+        let final_pos = [
+            0u8, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
+        ];
+        let p2 = shortest_path_cost(&start_pos, &final_pos).unwrap();
         assert_eq!(p2, 44169);
     }
 }
