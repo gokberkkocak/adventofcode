@@ -41,7 +41,7 @@ fn dist(from: u8, to: u8) -> u32 {
 }
 
 fn try_move_down(p: &[u8; 23], it: u8) -> Option<u8> {
-    assert!((1..=4).contains(&it));
+    debug_assert!((1..=4).contains(&it));
     let ppos = usize::from(it * 4 + 3);
     let pocket = &p[ppos..ppos + 4];
     for q in (0..=3).rev() {
