@@ -89,10 +89,6 @@ fn possible_moves(p: &[u8; 23]) -> Vec<(u8, u8)> {
                     break;
                 }
             }
-            // direct down, verify intermediate positions
-            if p[up as usize] == f {
-                continue;
-            }
             if let Some(down) = try_move_down(p, p[up as usize]) {
                 let right_target = p[up as usize];
                 let left_target = p[up as usize] + 1;
