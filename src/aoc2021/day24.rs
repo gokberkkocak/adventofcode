@@ -21,7 +21,7 @@ fn core(input: &str) -> (usize, usize) {
             .unwrap();
         if z_division == 1 {
             // x gets 1
-            // z keep prev_w+ prev_v14
+            // z keep prev_w+ prev_v14 push
             let f = v_ins[14]
                 .strip_prefix("add y ")
                 .unwrap()
@@ -29,7 +29,7 @@ fn core(input: &str) -> (usize, usize) {
                 .unwrap();
             stack.push((now, f));
         } else if z_division == 26 {
-            // z gets reset to 0
+            // z pops one value
             // x gets prev_w + prev_v14 + now_v3. if x == now_w, x gets 0 which make z 0
             let (mut prev, x) = stack.pop().unwrap();
             let mut diff = x + v_ins[4]
