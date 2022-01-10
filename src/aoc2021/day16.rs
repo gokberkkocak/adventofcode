@@ -154,15 +154,14 @@ enum InnerPacket {
     Operator(OperatorPacket),
 }
 
+#[cfg(test)]
 impl InnerPacket {
-    #[allow(dead_code)]
     fn is_inner_packet(&self) -> bool {
         match self {
             InnerPacket::Literal(_) => true,
             InnerPacket::Operator(_) => false,
         }
     }
-    #[allow(dead_code)]
     fn is_operator_packet(&self) -> bool {
         match self {
             InnerPacket::Literal(_) => false,
