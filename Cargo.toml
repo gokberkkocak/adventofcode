@@ -15,7 +15,7 @@ structopt = "0.3"
 once_cell= "1.8"
 ahash = "0.7"
 fxhash = "0.2"
-bitvec = "0.22"
+bitvec = "1.0"
 itertools = "0.10"
 
 [profile.production]
