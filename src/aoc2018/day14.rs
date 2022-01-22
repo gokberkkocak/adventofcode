@@ -55,24 +55,19 @@ fn part2(input: &str) -> usize {
         elf2: 1,
     };
     let seq_len = seq.len();
-    let ans;
     loop {
-        let ret = recipes.next();
+        let double_add = recipes.next();
         let recipes_len = recipes.scores.len();
         if recipes_len > seq_len && recipes.scores[recipes_len - seq_len..recipes_len] == seq {
-            ans = recipes_len - seq_len;
-            break;
+            return recipes_len - seq_len;
         }
-
-        if ret
+        if double_add
             && recipes_len > seq_len + 1
             && recipes.scores[recipes_len - 1 - seq_len..recipes_len - 1] == seq
         {
-            ans = recipes_len - 1 - seq_len;
-            break;
+            return recipes_len - 1 - seq_len;
         }
     }
-    ans
 }
 
 #[cfg(test)]
