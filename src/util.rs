@@ -26,7 +26,7 @@ pub fn get_puzzle_input(year: u32, day: u8) -> String {
         read_file(&filename)
     } else {
         dotenv().ok();
-        if let Ok(session) = env::var("SESSION") {
+        if let Ok(session) = env::var("AOC_SESSION") {
             let mut easy = Easy2::new(Collector(Vec::new()));
             easy.get(true).unwrap();
             let input_url = format!("https://adventofcode.com/{}/day/{}/input", year, day);

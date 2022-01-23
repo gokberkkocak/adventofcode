@@ -2,7 +2,7 @@
 
 A runner for AoC and solutions for every year  (hopefully).
 
-Requires session cookie in ```.env``` file in the form of ```SESSION=X```. 
+Requires session cookie in the environment variable ```AOC_SESSION```. You can also use a ```.env``` file. 
 
 ## Usage 
 
