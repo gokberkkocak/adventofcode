@@ -121,7 +121,7 @@ pub fn run() {
 fn time_adjust(date: NaiveDateTime) -> NaiveDateTime {
     if date.hour() == 23 {
         let new_date = date.date() + Duration::days(1);
-        return new_date.and_hms(0, 0, 0);
+        return new_date.and_hms_opt(0, 0, 0).unwrap();
     }
     date
 }
