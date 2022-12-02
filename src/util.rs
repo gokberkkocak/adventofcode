@@ -9,6 +9,8 @@ use chrono::{Datelike, Utc};
 use curl::easy::{Easy2, Handler, WriteError};
 use dotenv::dotenv;
 
+const USER_AGENT: &str = "github.com/gokberkkocak/adventofcode using libcurl";
+
 struct Collector(Vec<u8>);
 
 impl Handler for Collector {
@@ -32,6 +34,7 @@ pub fn get_puzzle_input(year: u32, day: u8) -> String {
             let input_url = format!("https://adventofcode.com/{}/day/{}/input", year, day);
             easy.url(&input_url).unwrap();
             easy.cookie(&format!("session={}", session)).unwrap();
+            easy.useragent(USER_AGENT).unwrap();
             easy.perform().unwrap();
             let contents = easy.get_ref();
             write_to_file(&contents.0, &filename);
