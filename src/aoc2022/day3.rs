@@ -9,17 +9,12 @@ pub fn run() {
 pub fn part1(input: &str) -> u64 {
     input
         .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| char_to_priority(c))
-                .collect::<Vec<_>>()
-        })
+        .map(|line| line.chars().map(char_to_priority).collect::<Vec<_>>())
         .map(|line| {
             let n = line.len();
             let r1 = line[..n / 2].iter().collect::<Vec<_>>();
             let r2 = line[n / 2..].iter().collect::<Vec<_>>();
-            let el = **r1.iter().find(|c| r2.contains(c)).unwrap();
-            el as u64
+            **r1.iter().find(|&c| r2.contains(c)).unwrap() as u64
         })
         .sum()
 }
@@ -27,11 +22,7 @@ pub fn part1(input: &str) -> u64 {
 pub fn part2(input: &str) -> u64 {
     input
         .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| char_to_priority(c))
-                .collect::<Vec<_>>()
-        })
+        .map(|line| line.chars().map(char_to_priority).collect::<Vec<_>>())
         .collect::<Vec<_>>()
         .chunks(3)
         .map(|chunk| {
