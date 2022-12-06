@@ -7,29 +7,26 @@ pub fn run() {
 }
 
 pub fn parse(input: &str) -> impl Iterator<Item = (u8, u8, u8, u8)> + '_ {
-    input.lines().map(|pair_str| {
-        let pairs = pair_str.split(',').collect::<Vec<_>>();
-        let elf_1 = pairs[0]
-            .split('-')
-            .map(|i| i.parse::<u8>().unwrap())
-            .collect::<Vec<_>>();
-        let elf_2 = pairs[1]
-            .split('-')
-            .map(|i| i.parse::<u8>().unwrap())
-            .collect::<Vec<_>>();
-        (elf_1[0], elf_1[1], elf_2[0], elf_2[1])
-    })
+    input
+        .lines()
+        .map(|pair| {
+            pair
+                .split(',')
+                .flat_map(|a| a.split('-').map(|i| i.parse::<u8>().unwrap()))
+                .collect::<Vec<_>>()
+        })
+        .map(|v| (v[0], v[1], v[2], v[3]))
 }
 
 pub fn part1(input: &str) -> u64 {
-    parse(&input)
+    parse(input)
         .filter(|(a, b, m, n)| (m <= a && b <= n) || (a <= m && n <= b))
         .count() as u64
 }
 
 pub fn part2(input: &str) -> u64 {
-    parse(&input)
-        .filter(|(a, b, m, n)| (a <= m && m <= b) || (m <= a && a <= n))
+    parse(input)
+        .filter(|(a, b, m, n)| (m <= b && a <= n))
         .count() as u64
 }
 
