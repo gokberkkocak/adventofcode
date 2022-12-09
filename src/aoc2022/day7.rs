@@ -11,12 +11,12 @@ pub fn run() {
 }
 
 pub fn part1(root: &Node) -> u64 {
-    let sizes = all_subdir_sizes(&root);
+    let sizes = all_subdir_sizes(root);
     sizes.iter().filter(|size| **size < 100_000).sum()
 }
 
 pub fn part2(root: &Node) -> u64 {
-    let sizes = all_subdir_sizes(&root);
+    let sizes = all_subdir_sizes(root);
     let root_size = root.size();
     *sizes
         .iter()
@@ -26,7 +26,7 @@ pub fn part2(root: &Node) -> u64 {
 }
 
 fn to_line_vec(input: &str) -> Vec<&str> {
-    input.lines().map(|line| line).collect()
+    input.lines().collect()
 }
 
 fn traverse(input: &[&str], mut line_number: usize) -> (Node, usize) {
@@ -38,7 +38,7 @@ fn traverse(input: &[&str], mut line_number: usize) -> (Node, usize) {
             b'$' => {
                 if line.as_bytes()[2] == b'c' {
                     // cd
-                    let name = line.split_ascii_whitespace().skip(2).next().unwrap();
+                    let name = line.split_ascii_whitespace().nth(2).unwrap();
                     if name == ".." {
                         // return to parent
                         return (Node::Dir(content, total_size), line_number);

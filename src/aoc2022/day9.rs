@@ -42,8 +42,7 @@ fn solve<const N: usize>(moves: Vec<(Direction, u8)>) -> usize {
             points[N - 1]
         })
         .collect::<HashSet<_>>()
-        .iter()
-        .count()
+        .len()
 }
 
 #[derive(Debug, Clone, Copy)]

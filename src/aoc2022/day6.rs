@@ -14,7 +14,7 @@ pub fn core(input: &str, d: usize) -> usize {
         .find(|(_, w)| {
             w.iter()
                 .enumerate()
-                .all(|(i, x)| w.iter().skip(i + 1).find(|&y| x == y).is_none())
+                .all(|(i, x)| !w.iter().skip(i + 1).any(|y| x == y))
         })
         .unwrap()
         .0

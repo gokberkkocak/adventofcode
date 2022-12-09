@@ -13,14 +13,13 @@ pub fn parse(input: &str) -> (Vec<Vec<char>>, Vec<(usize, usize, usize)>) {
         .lines()
         .rev()
         .skip(1)
-        .map(|line| {
+        .flat_map(|line| {
             line.as_bytes()
                 .chunks(4)
                 .map(|chunk| chunk[1] as char)
                 .enumerate()
                 .collect::<Vec<_>>()
         })
-        .flatten()
         .collect::<Vec<_>>();
     let stacks = create_stacks(&v);
 
