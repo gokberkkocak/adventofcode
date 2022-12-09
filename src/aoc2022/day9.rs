@@ -107,7 +107,14 @@ mod tests {
     }
 
     #[test]
-    fn test_2() {
+    fn test_2_1() {
+        let input = crate::util::read_file("inputs/2022_9_test.in");
+        let p2 = part2(&input);
+        assert_eq!(p2, 1);
+    }
+
+    #[test]
+    fn test_2_2() {
         let input = crate::util::read_file("inputs/2022_9_test_2.in");
         let p2 = part2(&input);
         assert_eq!(p2, 36);
