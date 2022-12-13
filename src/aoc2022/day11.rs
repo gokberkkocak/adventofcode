@@ -9,7 +9,7 @@ pub fn run() {
 }
 
 fn play_monkey_business(v: &mut [Monkey], turn: usize, boring: bool) -> usize {
-    let big_divider = v.iter().map(|m| m.test.divisible_test).product::<usize>(); 
+    let big_divider = v.iter().map(|m| m.test.divisible_test).product::<usize>();
     for _ in 0..turn {
         play_turn(v, big_divider, boring);
     }
@@ -23,7 +23,7 @@ fn play_turn(v: &mut [Monkey], big_divider: usize, boring: bool) {
         while let Some(item) = v[i].items.pop() {
             let mut adjusted = v[i].operation.apply(item % big_divider);
             if boring {
-                adjusted = adjusted / 3;
+                adjusted /= 3;
             }
             let new_owner = v[i].test.test(adjusted);
             v[i].inspect_count += 1;
@@ -33,10 +33,7 @@ fn play_turn(v: &mut [Monkey], big_divider: usize, boring: bool) {
 }
 
 fn parse(input: &str) -> Vec<Monkey> {
-    let mut v = input
-        .split("\n\n")
-        .map(|m_str| Monkey::parse(m_str))
-        .collect::<Vec<_>>();
+    let mut v = input.split("\n\n").map(Monkey::parse).collect::<Vec<_>>();
     v.sort_unstable();
     v
 }
@@ -53,8 +50,8 @@ struct Monkey {
 impl Monkey {
     fn parse(m_str: &str) -> Self {
         let mut lines = m_str.lines();
-        let id = lines.next().unwrap().split(" ").nth(1).unwrap().as_bytes()[0] - b'0';
-        let items = lines.next().unwrap().split(": ").skip(1).next().unwrap();
+        let id = lines.next().unwrap().split(' ').nth(1).unwrap().as_bytes()[0] - b'0';
+        let items = lines.next().unwrap().split(": ").nth(1).unwrap();
         let items = items
             .split(", ")
             .map(|s| s.parse::<usize>().unwrap())
@@ -103,16 +100,16 @@ enum Operation {
 
 impl Operation {
     fn parse(op_str: &str) -> Self {
-        let it = op_str.split("new = old ");
-        let op = it.skip(1).next().unwrap();
+        let mut it = op_str.split("new = old ");
+        let op = it.nth(1).unwrap();
         let op_char = op.as_bytes()[0];
         match op_char {
             b'+' => {
-                let num = op.split(" ").nth(1).unwrap().parse::<usize>().unwrap();
+                let num = op.split(' ').nth(1).unwrap().parse::<usize>().unwrap();
                 Operation::Add(num)
             }
             b'*' => {
-                if let Ok(num) = op.split(" ").nth(1).unwrap().parse::<usize>() {
+                if let Ok(num) = op.split(' ').nth(1).unwrap().parse::<usize>() {
                     Operation::Multiply(num)
                 } else {
                     Operation::Square
