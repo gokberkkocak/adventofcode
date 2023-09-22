@@ -1,9 +1,8 @@
 use std::time::Instant;
 
-use aoc::AOCYear;
 use structopt::StructOpt;
+use year_lib::AOCYearTrait;
 
-mod aoc;
 mod aoc2018;
 mod aoc2020;
 mod aoc2021;
@@ -45,12 +44,12 @@ fn return_year_and_day(opt: &Opt) -> (i32, u32) {
     (year, day)
 }
 
-fn return_aoc_year(year: i32) -> Box<dyn AOCYear> {
+fn return_aoc_year(year: i32) -> Box<dyn AOCYearTrait> {
     match year {
         2018 => aoc2018::AOC2018::new(),
         2020 => aoc2020::AOC2020::new(),
         2021 => aoc2021::AOC2021::new(),
         2022 => aoc2022::AOC2022::new(),
-        _ => panic!("Year {} not implemented", year),
+        _ => unimplemented!(),
     }
 }
