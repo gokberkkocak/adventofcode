@@ -21,7 +21,7 @@ fn part2(input: &str) -> usize {
         .filter_map(|s| s.incomplete())
         .collect::<Vec<_>>();
     v.sort_unstable();
-    v[(v.len() / 2)]
+    v[v.len() / 2]
 }
 
 enum LineScore {

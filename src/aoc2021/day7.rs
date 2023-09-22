@@ -18,7 +18,7 @@ fn median(sorted_array: &[isize]) -> isize {
         let ind_right = sorted_array.len() / 2;
         ((sorted_array[ind_left] + sorted_array[ind_right]) / 2) as isize
     } else {
-        sorted_array[(sorted_array.len() / 2)]
+        sorted_array[sorted_array.len() / 2]
     }
 }
 
