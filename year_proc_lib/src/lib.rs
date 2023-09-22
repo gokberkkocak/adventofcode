@@ -1,5 +1,3 @@
-use std::{fs, path::Path};
-
 use proc_macro::TokenStream;
 
 use quote::quote;
@@ -14,7 +12,7 @@ pub fn aoc_year_maker(item: TokenStream) -> TokenStream {
     let struct_name = &ast.ident;
 
     let full = (1..=25u8).collect::<Vec<_>>();
-    let available = return_day_set(&struct_name.to_string()).unwrap();
+    let available = return_available_days(&struct_name.to_string()).unwrap();
     let not_available = full
         .iter()
         .filter(|item| !available.contains(item))
@@ -54,15 +52,13 @@ pub fn aoc_year_maker(item: TokenStream) -> TokenStream {
     expanded.into()
 }
 
-fn return_day_set(struct_name: &str) -> anyhow::Result<Vec<u8>> {
-    let module_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..")
+fn return_available_days(struct_name: &str) -> anyhow::Result<Vec<u8>> {
+    let module_path = std::env::current_dir()?
         .join("src")
         .join(struct_name.to_lowercase());
 
-    let mut v = Vec::new();
-    dbg!(&module_path);
-    for f in fs::read_dir(module_path)? {
+    let mut years = Vec::new();
+    for f in std::fs::read_dir(module_path)? {
         let f = f?;
         let filename = f.file_name();
         if let Some(filename) = filename.to_str() {
@@ -71,9 +67,9 @@ fn return_day_set(struct_name: &str) -> anyhow::Result<Vec<u8>> {
                     .trim_start_matches("day")
                     .trim_end_matches(".rs")
                     .parse::<u8>()?;
-                v.push(day);
+                  years.push(day);
             }
         }
     }
-    Ok(v)
+    Ok(years)
 }
