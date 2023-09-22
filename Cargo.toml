@@ -17,6 +17,8 @@ ahash = "0.8"
 fxhash = "0.2"
 bitvec = "1.0"
 itertools = "0.10"
+year_proc_lib = { path = "year_proc_lib" }
+year_lib = { path = "year_lib" }
 
 [profile.production]
 inherits = "release"

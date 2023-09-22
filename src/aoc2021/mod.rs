@@ -1,5 +1,5 @@
-use crate::aoc::AOCYear;
+use year_lib::AOCYearTrait;
+use year_proc_lib::AOCYear;
 
+#[derive(AOCYear)]
 pub struct AOC2021;
-
-crate::aoc::implement_year!(AOC2021);
