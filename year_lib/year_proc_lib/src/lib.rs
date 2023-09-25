@@ -32,20 +32,17 @@ pub fn aoc_year_maker(item: TokenStream) -> TokenStream {
       #(
         mod #available_module_names;
       )*
-      impl #struct_name {
-        pub fn new() -> Box<Self> {
+      impl AOCYear for #struct_name {
+        fn new() -> Box<dyn AOCYear> {
           Box::new(Self {})
         }
-      }
-      impl AOCYearTrait for #struct_name {
         #(
           fn #available_module_names(&self) {
             #available_module_names::run();
           }
         )*
-
         #(fn #not_available_module_names(&self) {
-            unimplemented!();
+            unimplemented!("day {}", #not_available);
         })*
       }
     };

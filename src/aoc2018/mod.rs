@@ -1,5 +1,4 @@
-use year_lib::AOCYearTrait;
-use year_proc_lib::AOCYear;
+use year_lib::AOCYear;
 
 #[derive(AOCYear)]
 pub struct AOC2018;
