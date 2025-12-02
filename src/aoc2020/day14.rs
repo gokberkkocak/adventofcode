@@ -41,7 +41,7 @@ fn get_sum(input: &str, mask_type: MaskType) -> usize {
         .sum::<usize>()
 }
 
-fn parse(input: &str) -> Vec<Mask> {
+fn parse(input: &str) -> Vec<Mask<'_>> {
     input
         .split("mask = ")
         .skip(1)

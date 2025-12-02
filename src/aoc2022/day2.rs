@@ -11,7 +11,7 @@ fn part1(input: &str) -> i32 {
         .lines()
         .map(|l| l.as_bytes())
         .map(|b| ((b[0] as u8 - b'A') as i32, (b[2] as u8 - b'X') as i32))
-        .map(|(op, me)| (1 + me + 3 * (1 + me - op).rem_euclid(3)))
+        .map(|(op, me)| 1 + me + 3 * (1 + me - op).rem_euclid(3))
         .sum()
 }
 
@@ -20,7 +20,7 @@ fn part2(input: &str) -> i32 {
         .lines()
         .map(|l| l.as_bytes())
         .map(|b| ((b[0] as u8 - b'A') as i32, (b[2] as u8 - b'X') as i32))
-        .map(|(op, win)| (1 + (op + win + 2) % 3 + 3 * win))
+        .map(|(op, win)| 1 + (op + win + 2) % 3 + 3 * win)
         .sum()
 }
 

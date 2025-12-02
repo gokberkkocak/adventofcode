@@ -10,7 +10,7 @@ pub fn run() {
     println!("p2 {}", p2);
 }
 
-fn parse(input: &str) -> (AllergenPool, Vec<&str>) {
+fn parse(input: &str) -> (AllergenPool<'_>, Vec<&str>) {
     let mut ingredient_domains: HashMap<(usize, usize), AllergenSupport> = HashMap::new();
     let mut allergen_set = vec![];
     let mut ingredient_set = vec![];

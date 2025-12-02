@@ -26,7 +26,7 @@ pub fn part1(input: &str) -> u64 {
 
 pub fn part2(input: &str) -> u64 {
     parse(input)
-        .filter(|(a, b, m, n)| (m <= b && a <= n))
+        .filter(|(a, b, m, n)| m <= b && a <= n)
         .count() as u64
 }
 
