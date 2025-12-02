@@ -7,6 +7,7 @@ mod aoc2018;
 mod aoc2020;
 mod aoc2021;
 mod aoc2022;
+mod aoc2025;
 mod util;
 
 #[derive(Debug, StructOpt)]
@@ -50,6 +51,7 @@ fn return_aoc_year(year: i32) -> Box<dyn AOCYear> {
         2020 => aoc2020::AOC2020::new(),
         2021 => aoc2021::AOC2021::new(),
         2022 => aoc2022::AOC2022::new(),
+        2025 => aoc2025::AOC2025::new(),
         _ => unimplemented!("year {}", year),
     }
 }
