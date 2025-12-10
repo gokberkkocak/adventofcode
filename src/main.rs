@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use structopt::StructOpt;
+use clap::Parser;
 use year_lib::AOCYear;
 
 mod aoc2018;
@@ -10,35 +10,35 @@ mod aoc2022;
 mod aoc2025;
 mod util;
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "aoc", about = "AoC runner.")]
-struct Opt {
+#[derive(Debug, Parser)]
+#[command(name = "aoc", about = "AoC runner.")]
+struct Args {
     /// Run all solutions for a given year.
-    #[structopt(short, long)]
+    #[arg(short, long)]
     all: bool,
 
     /// Which year to run (default: last available aoc year)
-    #[structopt(short, long)]
+    #[arg(short, long)]
     year: Option<i32>,
 
     /// Which day to run (default: last available aoc day)
-    #[structopt(short, long)]
+    #[arg(short, long)]
     day: Option<u32>,
 }
 
 fn main() {
-    let opt = Opt::from_args();
-    let (year, day) = return_year_and_day(&opt);
+    let args = Args::parse();
+    let (year, day) = return_year_and_day(&args);
     let aoc_year = return_aoc_year(year);
     let now = Instant::now();
-    match &opt.all {
+    match &args.all {
         true => aoc_year.run_all(),
         false => aoc_year.run_day(day),
     }
     println!("time spent {} us", now.elapsed().as_micros());
 }
 
-fn return_year_and_day(opt: &Opt) -> (i32, u32) {
+fn return_year_and_day(opt: &Args) -> (i32, u32) {
     let (latest_year, latest_day) = util::get_latest_year_and_day();
     let year = opt.year.unwrap_or(latest_year);
     let day = opt.day.unwrap_or(latest_day);

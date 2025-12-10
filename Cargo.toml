@@ -5,13 +5,13 @@ authors = ["Gokberk Kocak <gokberkkocak@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+clap = { version = "4.5", features = ["derive"] }
 curl = "0.4"
 chrono = "0.4"
 regex = "1.12"
 lazy_static = "1.5"
 dotenv = "0.15"
 fnv = "1.0"
-structopt = "0.3"
 once_cell= "1.21"
 ahash = "0.8"
 fxhash = "0.2"
