@@ -64,8 +64,9 @@ fn write_to_file(contents: &[u8], filepath: &str) {
 
 pub fn get_latest_year_and_day() -> (i32, u32) {
     let now = Utc::now();
+    let last_aoc_day = if now.year() > 2024 { 12 } else { 25 };
     match now.month() {
-        12 => (now.year(), now.day().min(25)),
-        _ => (now.year() - 1, 25),
+        12 => (now.year(), now.day().min(last_aoc_day)),
+        _ => (now.year() - 1, last_aoc_day),
     }
 }
