@@ -13,7 +13,6 @@ fn part1(ranges: &[std::ops::Range<usize>], values: &[usize]) -> usize {
     ranges
         .iter()
         .map(|range| {
-            dbg!(range, fn_position(range.end), fn_position(range.start));
             fn_position(range.end) - fn_position(range.start)
         })
         .sum()
